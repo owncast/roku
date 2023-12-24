@@ -95,6 +95,12 @@ function parseRokuFeedSpec(xmlString as string) as Object
             rootChildren = {
             children: []
             }
+            channelsByTag = {
+                "music": { name: "Music", channels: []},
+                "tech": { name: "Tech", channels: []},
+                "chatting": { name: "Chatting", channels: [] },
+                "video-games": {name: "Video Games", channels: [] }
+            }
             for each item in json
                 value = json[item]
                 if item = "movies" or item = "series" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
@@ -105,7 +111,7 @@ function parseRokuFeedSpec(xmlString as string) as Object
                             hdPosterUrl: arrayItem.thumbnail
                             Description: arrayItem.shortDescription
                             id: arrayItem.id
-                            Categories: arrayItem["genres"][0]
+                            Categories: arrayItem["tags"][0]
                             title: arrayItem.title
                         })
                         if item = "movies" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
@@ -113,34 +119,27 @@ function parseRokuFeedSpec(xmlString as string) as Object
                             'Never do like this, it' s better to check if all fields exist in json, but in sample we can skip this step
                             itemNode.Url = arrayItem.content.videos[0].url
                         end if
-                        if item = "series" 
-                            seasonArray = []
-                            if arrayItem.seasons <> invalid and arrayItem.seasons.Count() > 0
-                                for each season in arrayItem.seasons
-                                    episodeArray = []
-                                    for each episode in season.episodes
-                                        episodeArray.Push(GetEpisodeNodeFromJSON(episode))
-                                    end for
-                                    seasonArray.Push(episodeArray)
-                                end for
-                            else
-                                episodeArray = []
-                                for each episode in arrayItem.episodes
-                                    episodeArray.Push(GetEpisodeNodeFromJSON(episode))
-                                end for
-                                seasonArray.Push(episodeArray)
-                            end if
-                            Utils_ForceSetFields(itemNode, { "seasons": seasonArray })
-                        end if
+                        for each tag in arrayItem["tags"]
+                          if channelsByTag.DoesExist(tag)
+                              channelsByTag[tag].channels.Push(itemNode)
+                          end if
+                        end for
                         children.Push(itemNode)
                     end for
 
                     rowAA = {
-                        title: item
+                        title: "All Feeds"
                         children: children
                     }
                     rootChildren.children.Push(rowAA)
                 end if
+            end for
+            for each tag in channelsByTag.Keys()
+                row = {
+                    title: channelsByTag[tag].name
+                    children: channelsByTag[tag].channels
+                }
+                rootChildren.children.Push(row)
             end for
             m.top.content.Update(rootChildren)
         end if

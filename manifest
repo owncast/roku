@@ -1,4 +1,4 @@
-title=Channel
+title=Owncast
 
 major_version=1
 minor_version=0
@@ -21,6 +21,7 @@ supports_input_launch=1
 
 ' Update content feed URL
 
+FEED_URL=https://directory.owncast.online/api/roku
 #FEED_URL=https://ovp-feeds2-886239521314.s3.amazonaws.com/roku_tips_and_tricks_clip/ovpfeed.json
 #FEED_URL=https://content.jwplatform.com/feeds/6V5vHuPm.rss
 
