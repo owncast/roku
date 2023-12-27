@@ -26,15 +26,9 @@ sub GetContent()
     #endif
 
     if( feed.Len() < MAXSIZE AND feed.len() > 0 )
-        if( feed.StartsWith("<?xml") or feed.StartsWith("<rss"))
-            feedType = "XML"
-            parsed = parseMRSS(feed)
-        else
-            'assuming JSON
-            feedType = "JSON"
-            parsed = parseRokuFeedSpec(feed)
-            
-        endif 
+        'assuming JSON
+        feedType = "JSON"
+        parsed = parseRokuFeedSpec(feed)
     else
         if( feed.Len() > MAXSIZE )
             'any feed over 500Kb is too large to parse locally
@@ -112,10 +106,8 @@ function parseRokuFeedSpec(xmlString as string) as Object
             tagOrder = ["now-live", "music", "tech", "chatting", "video-games", "now-offline"]
             for each item in json
                 value = json[item]
-                if item = "movies" or item = "series" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
+                if item = "liveFeeds"
                     for each arrayItem in value
-                        if item = "movies" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
-                        end if
                         for each tag in arrayItem["tags"]
                             if channelsByTag.DoesExist(tag)
                                 itemNode = CreateObject("roSGNode", "ContentNode")
@@ -162,141 +154,6 @@ function parseRokuFeedSpec(xmlString as string) as Object
             rootChildren.children.Push(allChannelsRow)
             m.top.content.Update(rootChildren)
         end if
-end function
-
-function GetEpisodeNodeFromJSON(episode)
-    result = CreateObject("roSGNode", "ContentNode")
-
-    result.SetFields({
-        title: episode.title
-        url: episode.content.videos[0].url
-        hdPosterUrl: episode.thumbnail
-        description: episode.shortDescription
-    })
-
-    return result
-end function
-
-'
-' MRSS parser
-'
-function parseMRSS(xmlString as string) as Object
-    xmlParser = createObject("roXMLElement")
-    if xmlParser.parse(xmlString) then
-        if xmlParser.getName() = "rss" then
-            return parseRSS(xmlParser)
-        elseif xmlParser.getName() = "feed" then
-            return parseAtom(xmlParser)
-        else
-            return invalidMRSS("Invalid MRSS format")
-        end if
-    else
-        return invalidMRSS("Failed to parse MRSS")
-    end if
-end function
-
-'
-' All mRSS feeds present in the top 50 channels (which there are very few)
-' seem to fall into this structure 
-'
-function parseRSS(xmlParser as Object) as Object
-    responseXML = xmlParser.GetChildElements()
-    responseArray = xmlParser.GetChildElements()
-
-    rootChildren = {
-        children: []
-        }
-    children = [] 
-
-    for each xmlItem in responseArray 
-        if xmlItem.getName() = "channel"
-            channelAA = xmlItem.GetChildElements()
-            for each channel in channelAA
-                if channel.getName() = "item" 
-                    itemAA = channel.GetChildElements() '
-                    if itemAA <> invalid 
-                        items = {} 
-                        itemNode = CreateObject("roSGNode", "ContentNode")
-                                Utils_ForceSetFields(itemNode, {
-                                    Description: ""
-                                    id: ""
-                                    Categories: ""
-                                    title: ""
-                                })
-                        for each item in itemAA 
-                            items[item.getName()] = item.getText()
-                            if item.getName() = "title"
-                                itemNode.title = item.getText()
-                            endif
-
-                            if item.getName() = "description"
-                                itemNode.Description = item.getText()
-                            endif
-
-                            if item.getName() = "media:content" 'Checks to find <media:content> header
-                                itemNode.url = item.getAttributes().url
-                                itemNode.streamFormat = "" 'allow media player to try to autodetect 
-
-                                mediaContent = item.GetChildElements()
-                                for each mediaContentItem in mediaContent 
-                                    if mediaContentItem.getName() = "media:thumbnail"
-                                        itemNode.HDPosterUrl = mediaContentItem.getattributes().url 'Assigns images to item AA
-                                        itemNode.hdBackgroundImageUrl = mediaContentItem.getattributes().url
-                                    end if
-                                end for
-                            end if
-                        end for
-                        children.push(itemNode)
-                    end if
-                end if
-            end for
-            rowAA = {
-                title: items
-                children: children
-            }
-            rootChildren.children.Push(rowAA)
-        end if
-    end for
-    m.top.content.Update(rootChildren)
-    return rootChildren 
-end function
-
-'
-' I haven't found any feeds that fall into this scenario
-' we probably don't need this? 
-'
-function parseAtom(xmlParser as Object) as Object
-    mrss = {}
-    mrss["title"] = xmlParser.GetNamedElements("title").getText()
-    mrss["items"] = []
-    
-    for each entry in xmlParser.GetNamedElements("entry")
-        mrssItem = {}
-        mrssItem["title"] = entry.GetNamedElements("title").getText()
-        mrssItem["description"] = entry.GetNamedElements("summary").getText()
-        mrssItem["pubDate"] = entry.GetNamedElements("published").getText()
-        mrssItem["media"] = []
-        
-        for each media in entry.GetNamedElements("media:content")
-            mrssMedia = {}
-            mrssMedia["url"] = media.GetNamedElements("url")
-            mrssMedia["type"] = media.GetNamedElements("type")
-            mrssMedia["width"] = media.GetNamedElements("width")
-            mrssMedia["height"] = media.GetNamedElements("height")
-            mrss["media"].Append(mrssMedia)
-        end for
-        
-        mrss["items"].Append(mrssItem)
-    end for
-    
-    return mrss
-end function
-
-function invalidMRSS(message as string) as Object
-    return {
-        "error": true,
-        "message": message
-    }
 end function
 
 function ConvertToStringAndJoin(dataArray as Object, divider = " | " as String) as String
