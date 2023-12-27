@@ -123,7 +123,7 @@ function parseRokuFeedSpec(xmlString as string) as Object
                                     hdPosterUrl: arrayItem.thumbnail
                                     Description: arrayItem.shortDescription
                                     id: arrayItem.id
-                                    Categories: arrayItem["tags"][0]
+                                    Categories: ConvertToStringAndJoin(arrayItem["tags"], ", ")
                                     title: arrayItem.title
                                 })
                                 itemNode.Url = arrayItem.content.videos[0].url
@@ -138,7 +138,7 @@ function parseRokuFeedSpec(xmlString as string) as Object
                             hdPosterUrl: arrayItem.thumbnail
                             Description: arrayItem.shortDescription
                             id: arrayItem.id
-                            Categories: arrayItem["tags"][0]
+                            Categories: ConvertToStringAndJoin(arrayItem["tags"], ", ")
                             title: arrayItem.title
                         })
                         itemNode.Url = arrayItem.content.videos[0].url
@@ -298,3 +298,27 @@ function invalidMRSS(message as string) as Object
         "message": message
     }
 end function
+
+function ConvertToStringAndJoin(dataArray as Object, divider = " | " as String) as String
+    result = ""
+    if Type(dataArray) = "roArray" and dataArray.Count() > 0
+        for each item in dataArray
+            if item <> invalid
+                strFormat = invalid
+                if GetInterface(item, "ifToStr") <> invalid
+                    strFormat = item.Tostr()
+                else if GetInterface(item, "ifArrayJoin") <> invalid
+                    strFormat = item.Join(" | ")
+                end if
+                if strFormat <> invalid then
+                    if strFormat.Len() > 0
+                        if result.Len() > 0 then result += divider
+                        result += strFormat
+                    end if
+                end if
+            end if
+        end for
+    end if
+    return result
+end function
+

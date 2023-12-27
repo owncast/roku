@@ -68,7 +68,8 @@ sub Init()
         }
         info2: {
             width: 357
-            wrap: false
+            wrap: true
+            maxLines: 4
             horizAlign: "right"
         }
     }
