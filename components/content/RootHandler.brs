@@ -96,16 +96,43 @@ function parseRokuFeedSpec(xmlString as string) as Object
             children: []
             }
             channelsByTag = {
-                "music": { name: "Music", channels: []},
-                "tech": { name: "Tech", channels: []},
+                "now-live": { name: "Now Live", channels: [] },
+                "music": { name: "Music", channels: [] },
+                "tech": { name: "Tech", channels: [] },
                 "chatting": { name: "Chatting", channels: [] },
-                "video-games": {name: "Video Games", channels: [] }
+                "video-games": { name: "Video Games", channels: [] },
+                "now-offline": { name: "Offline", channels: [] }
             }
+ 
+            allChannels = {
+                name: "All Feeds"
+                channels: []
+            }
+
+            tagOrder = ["now-live", "music", "tech", "chatting", "video-games", "now-offline"]
             for each item in json
                 value = json[item]
                 if item = "movies" or item = "series" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
-                    children = []
                     for each arrayItem in value
+                        if item = "movies" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
+                        end if
+                        for each tag in arrayItem["tags"]
+                            if channelsByTag.DoesExist(tag)
+                                itemNode = CreateObject("roSGNode", "ContentNode")
+                                Utils_ForceSetFields(itemNode, {
+                                    hdPosterUrl: arrayItem.thumbnail
+                                    Description: arrayItem.shortDescription
+                                    id: arrayItem.id
+                                    Categories: arrayItem["tags"][0]
+                                    title: arrayItem.title
+                                })
+                                itemNode.Url = arrayItem.content.videos[0].url
+                                channelsByTag[tag].channels.Push(itemNode)
+                            end if
+                        end for
+
+                        ' Seems you need a unique ContentNode per place in the grid
+                        ' so this one is for the "all feeds" one
                         itemNode = CreateObject("roSGNode", "ContentNode")
                         Utils_ForceSetFields(itemNode, {
                             hdPosterUrl: arrayItem.thumbnail
@@ -114,33 +141,25 @@ function parseRokuFeedSpec(xmlString as string) as Object
                             Categories: arrayItem["tags"][0]
                             title: arrayItem.title
                         })
-                        if item = "movies" or item = "shortFormVideos" or item = "tvSpecials" or item = "liveFeeds"
-                            ' Add 4k option
-                            'Never do like this, it' s better to check if all fields exist in json, but in sample we can skip this step
-                            itemNode.Url = arrayItem.content.videos[0].url
-                        end if
-                        for each tag in arrayItem["tags"]
-                          if channelsByTag.DoesExist(tag)
-                              channelsByTag[tag].channels.Push(itemNode)
-                          end if
-                        end for
-                        children.Push(itemNode)
+                        itemNode.Url = arrayItem.content.videos[0].url
+                        allChannels.channels.Push(itemNode)
                     end for
-
-                    rowAA = {
-                        title: "All Feeds"
-                        children: children
-                    }
-                    rootChildren.children.Push(rowAA)
                 end if
             end for
-            for each tag in channelsByTag.Keys()
+
+            ' Render out the rows here
+            for each tag in tagOrder
                 row = {
                     title: channelsByTag[tag].name
                     children: channelsByTag[tag].channels
                 }
                 rootChildren.children.Push(row)
             end for
+            allChannelsRow = {
+                title: allChannels.name
+                children: allChannels.channels
+            }
+            rootChildren.children.Push(allChannelsRow)
             m.top.content.Update(rootChildren)
         end if
 end function
