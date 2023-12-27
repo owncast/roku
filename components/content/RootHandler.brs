@@ -110,30 +110,14 @@ function parseRokuFeedSpec(xmlString as string) as Object
                     for each arrayItem in value
                         for each tag in arrayItem["tags"]
                             if channelsByTag.DoesExist(tag)
-                                itemNode = CreateObject("roSGNode", "ContentNode")
-                                Utils_ForceSetFields(itemNode, {
-                                    hdPosterUrl: arrayItem.thumbnail
-                                    Description: arrayItem.shortDescription
-                                    id: arrayItem.id
-                                    Categories: ConvertToStringAndJoin(arrayItem["tags"], ", ")
-                                    title: arrayItem.title
-                                })
-                                itemNode.Url = arrayItem.content.videos[0].url
+                                itemNode = CreateOwncastFeedContentNode(arrayItem)
                                 channelsByTag[tag].channels.Push(itemNode)
                             end if
                         end for
 
                         ' Seems you need a unique ContentNode per place in the grid
                         ' so this one is for the "all feeds" one
-                        itemNode = CreateObject("roSGNode", "ContentNode")
-                        Utils_ForceSetFields(itemNode, {
-                            hdPosterUrl: arrayItem.thumbnail
-                            Description: arrayItem.shortDescription
-                            id: arrayItem.id
-                            Categories: ConvertToStringAndJoin(arrayItem["tags"], ", ")
-                            title: arrayItem.title
-                        })
-                        itemNode.Url = arrayItem.content.videos[0].url
+                        itemNode = CreateOwncastFeedContentNode(arrayItem)
                         allChannels.channels.Push(itemNode)
                     end for
                 end if
@@ -154,6 +138,19 @@ function parseRokuFeedSpec(xmlString as string) as Object
             rootChildren.children.Push(allChannelsRow)
             m.top.content.Update(rootChildren)
         end if
+end function
+
+function CreateOwncastFeedContentNode(arrayItem)
+    itemNode = CreateObject("roSGNode", "ContentNode")
+    Utils_ForceSetFields(itemNode, {
+        hdPosterUrl: arrayItem.thumbnail
+        Description: arrayItem.shortDescription
+        id: arrayItem.id
+        Categories: ConvertToStringAndJoin(arrayItem["tags"], ", ")
+        title: arrayItem.title
+    })
+    itemNode.Url = arrayItem.content.videos[0].url
+    return itemNode
 end function
 
 function ConvertToStringAndJoin(dataArray as Object, divider = " | " as String) as String
