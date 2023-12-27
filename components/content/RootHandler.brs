@@ -108,7 +108,11 @@ function parseRokuFeedSpec(xmlString as string) as Object
                 value = json[item]
                 if item = "liveFeeds"
                     for each arrayItem in value
-                        for each tag in arrayItem["tags"]
+                        ' Note that this was originally a "for each" loop, but something about nesting
+                        ' this code as another "for each" loop led to only the first tag being considered
+                        ' so it's been converted to the more traditional style just to avoid the problem
+                        for i=0 to arrayItem["tags"].Count()-1
+                            tag = arrayItem["tags"][i]
                             if channelsByTag.DoesExist(tag)
                                 itemNode = CreateOwncastFeedContentNode(arrayItem)
                                 channelsByTag[tag].channels.Push(itemNode)
