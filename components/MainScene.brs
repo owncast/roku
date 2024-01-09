@@ -50,8 +50,15 @@ end sub
 sub OnGridItemSelected(event as Object)
     grid = event.GetRoSGNode()
     selectedIndex = event.GetData()
-    rowContent = grid.content.GetChild(selectedIndex[0])
-    detailsView = ShowDetailsView(rowContent, selectedIndex[1])
+
+    ' selectedIndex[0] is row, selectedIndex[1] is column; using GetChild() sequentially gets the selected item
+    selectedContent = grid.content.GetChild(selectedIndex[0]).GetChild(selectedIndex[1])
+
+    ' populating a DetailsView with only the selected item, index 0, and "false" for "not a content list"
+    ' this prevents the app from treating the entire row as a playlist, so when the stream stops playing,
+    ' it doesn't autoplay the next one
+
+    detailsView = ShowDetailsView(selectedContent, 0, false)
     detailsView.ObserveField("wasClosed", "OnDetailsWasClosed")
 end sub
 
