@@ -1,4 +1,4 @@
-title=Owncast Directory
+title=Owncasts
 
 major_version=1
 minor_version=0
@@ -25,18 +25,18 @@ FEED_URL=https://directory.owncast.online/api/roku
 #FEED_URL=https://ovp-feeds2-886239521314.s3.amazonaws.com/roku_tips_and_tricks_clip/ovpfeed.json
 #FEED_URL=https://content.jwplatform.com/feeds/6V5vHuPm.rss
 
-' Update theme elements                                                                             
+' Update theme elements
 
 OverhangLogoUri=pkg:/images/owncast_roku_overhang_logo_hd.png
 #OverhangTitle=
-#OverhangTitleColor= 
-#OverhangBackgroundUri= 
-#OverhangBackgroundColor= 
+#OverhangTitleColor=
+#OverhangBackgroundUri=
+#OverhangBackgroundColor=
 
-#textColor= 
-#focusRingColor= 
-#progressBarColor= 
-#busySpinnerColor= 
+#textColor=
+#focusRingColor=
+#progressBarColor=
+#busySpinnerColor=
 
 backgroundImageURI=pkg:/images/owncast_roku_background_hd.jpg
-#backgroundColor= 
+#backgroundColor=
