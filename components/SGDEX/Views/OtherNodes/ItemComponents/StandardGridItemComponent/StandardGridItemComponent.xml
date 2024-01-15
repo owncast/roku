@@ -19,6 +19,7 @@
         <Poster
             id="poster"
             loadDisplayMode="scaleToFit"
+            failedBitmapUri="pkg:/images/owncasts-icon-wide-tv.jpeg"
         />
         <Rectangle
             id="labelsBackground"
