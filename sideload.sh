@@ -5,6 +5,7 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
+TMPDIR="${TMPDIR:-/tmp}"
 ROKU_TMP_BUNDLE_FILE="$TMPDIR/rokubundle.zip"
 
 echo "Creating $ROKU_TMP_BUNDLE_FILE"
