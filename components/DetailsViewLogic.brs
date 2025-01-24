@@ -23,10 +23,11 @@ end function
 
 sub OnDetailsContentSet(event as Object)
     btnsContent = CreateObject("roSGNode", "ContentNode")
-    if event.GetData().TITLE = "series"
-        btnsContent.Update({ children: [{ title: "Episodes", id: "episodes" }] })
+    content = event.getData()
+    if content.favorite
+        btnsContent.Update({ children: [{ title: "Play", id: "play" }, { title: "Remove Favorite", id: "remove-favorite"}] })
     else
-        btnsContent.Update({ children: [{ title: "Play", id: "play" }] })
+        btnsContent.Update({ children: [{ title: "Play", id: "play" }, { title: "Add Favorite", id: "add-favorite"}] })
     end if
 
     details = event.GetRoSGNode()
@@ -40,8 +41,18 @@ sub OnButtonSelected(event as Object)
     if selectedButton.id = "play"
         videoView = OpenVideoPlayer(details.content, details.itemFocused, details.isContentList)
         videoView.ObserveField("wasClosed", "OnVideoWasClosed")
-    else if selectedButton.id = "episodes"
-        ShowEpisodePickerView(details.currentItem.seasons)
+    else if selectedButton.id = "add-favorite"
+        favorites = Utils_GetFavorites()
+        favorites.AddReplace(details.content.id, true)
+        Utils_SaveFavorites(favorites)
+        details.content.favorite = true
+        details.content.favoriteUpdated = true
+    else if selectedButton.id = "remove-favorite"
+        favorites = Utils_GetFavorites()
+        favorites.Delete(details.content.id)
+        Utils_SaveFavorites(favorites)
+        details.content.favorite = false
+        details.content.favoriteUpdated = true
     end if
 end sub
 

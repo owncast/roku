@@ -103,31 +103,51 @@ function parseRokuFeedSpec(xmlString as string) as Object
                 channels: []
             }
 
+            favoriteChannels = {
+                name: "Favorites"
+                channels: []
+            }
+            favorites = Utils_GetFavorites()
+
             tagOrder = ["now-live", "music", "tech", "chatting", "video-games", "now-offline"]
             for each item in json
                 value = json[item]
                 if item = "liveFeeds"
                     for each arrayItem in value
+                        isFavorite = false
+                        if favorites?[arrayItem["id"]] <> invalid
+                            isFavorite = true
+                            itemNode = CreateOwncastFeedContentNode(arrayItem, isFavorite)
+                            favoriteChannels.channels.Push(itemNode)
+                        end if
                         ' Note that this was originally a "for each" loop, but something about nesting
                         ' this code as another "for each" loop led to only the first tag being considered
                         ' so it's been converted to the more traditional style just to avoid the problem
                         for i=0 to arrayItem["tags"].Count()-1
                             tag = arrayItem["tags"][i]
                             if channelsByTag.DoesExist(tag)
-                                itemNode = CreateOwncastFeedContentNode(arrayItem)
+                                itemNode = CreateOwncastFeedContentNode(arrayItem, isFavorite)
                                 channelsByTag[tag].channels.Push(itemNode)
                             end if
                         end for
 
                         ' Seems you need a unique ContentNode per place in the grid
                         ' so this one is for the "all feeds" one
-                        itemNode = CreateOwncastFeedContentNode(arrayItem)
+                        itemNode = CreateOwncastFeedContentNode(arrayItem, isFavorite)
                         allChannels.channels.Push(itemNode)
                     end for
                 end if
             end for
 
             ' Render out the rows here
+            if favoriteChannels["channels"].Count() > 0
+                row = {
+                    title: favoriteChannels.name
+                    children: favoriteChannels.channels
+                }
+                rootChildren.children.Push(row)
+            end if
+
             for each tag in tagOrder
                 row = {
                     title: channelsByTag[tag].name
@@ -144,7 +164,7 @@ function parseRokuFeedSpec(xmlString as string) as Object
         end if
 end function
 
-function CreateOwncastFeedContentNode(arrayItem)
+function CreateOwncastFeedContentNode(arrayItem, isFavorite)
     itemNode = CreateObject("roSGNode", "ContentNode")
     Utils_ForceSetFields(itemNode, {
         hdPosterUrl: arrayItem.thumbnail
@@ -152,7 +172,14 @@ function CreateOwncastFeedContentNode(arrayItem)
         id: arrayItem.id
         Categories: ConvertToStringAndJoin(arrayItem["tags"], ", ")
         title: arrayItem.title
+        favorite: isFavorite
+        favoriteUpdated: false
     })
+    for i = 0 to arrayItem["tags"].Count() - 1
+        if arrayItem["tags"][i] = "now-live"
+            itemNode.setField("shortDescriptionLine1", "LIVE")
+        end if
+    end for
     itemNode.Url = arrayItem.content.videos[0].url
     return itemNode
 end function

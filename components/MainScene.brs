@@ -26,6 +26,9 @@ sub Show(args as Object)
     m.grid.SetFields({
         style: "standard"
         posterShape: "16x9"
+        theme: {
+            itemTextBackgroundColor: "0x00000080"
+        }
     })
     content = CreateObject("roSGNode", "ContentNode")
     content.AddFields({
@@ -64,7 +67,17 @@ end sub
 
 sub OnDetailsWasClosed(event as Object)
     details = event.GetRoSGNode()
-    m.grid.jumpToRowItem = [m.grid.rowItemFocused[0], details.itemFocused]
+    if details.content.favoriteUpdated = true
+        content = CreateObject("roSGNode", "ContentNode")
+        content.AddFields({
+            HandlerConfigGrid: {
+                name: "RootHandler"
+            }
+        })
+        m.grid.content = content
+    else
+        m.grid.jumpToRowItem = [m.grid.rowItemFocused[0], details.itemFocused]
+    end if
 end sub
 
 sub Input(args as object)

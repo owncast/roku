@@ -58,3 +58,16 @@ Function Utils_ContentList2Node(contentList as Object) as Object
 
     return result
 End Function
+
+function Utils_GetFavorites() as dynamic
+    sec = CreateObject("roRegistrySection", "Favorites")
+    if sec.Exists("Favorites")
+        return ParseJson(sec.Read("Favorites"))
+    end if
+    return {}
+end function
+
+function Utils_SaveFavorites(favorites) as boolean
+    sec = CreateObject("roRegistrySection", "Favorites")
+    return sec.Write("Favorites", FormatJson(favorites))
+end function
