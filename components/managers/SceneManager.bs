@@ -1,0 +1,48 @@
+import "pkg:/source/Misc.bs"
+
+sub init()
+    m.sceneList = []
+    m.currentScene = m.top.getScene()
+    m.body = m.currentScene.findNode("body")
+end sub
+
+sub show(newContent as object)
+    currentScene = m.sceneList.peek()
+    if isValid(currentScene)
+        currentScene.finalFocus = currentScene.focusedChild
+    end if
+
+    m.sceneList.push(newContent)
+
+    if m.body.getchildcount() = 0
+        m.body.appendChild(newContent)
+    else
+        m.body.replaceChild(newContent, 0)
+    end if
+
+    newContent.setFocus(true)
+end sub
+
+sub back()
+    m.sceneList.pop()
+
+    newContent = m.sceneList.peek()
+
+    if not isValid(newContent) then return
+
+    if m.body.getchildcount() = 0
+        m.body.appendChild(newContent)
+    else
+        m.body.replaceChild(newContent, 0)
+    end if
+
+    if isValid(newContent.finalFocus)
+        newContent.finalFocus.setFocus(true)
+    else
+        newContent.setFocus(true)
+    end if
+end sub
+
+function getCurrent() as object
+    return m.sceneList.peek()
+end function

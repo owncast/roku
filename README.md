@@ -1,13 +1,12 @@
-# Direct Publisher to SDK Conversion template
+# Owncast-Roku
 
-This template enables Direct Publisher channels to be converted to SDK with minimal coding. For step-by-step instructions on converting RDP channels to SDK channels, see the [conversion guide](https://developer.roku.com/docs/direct-publisher/rdp-sdk-coversion-guide.md).
+Create a file named `.env` in the root folder with the following content:
 
-## Deploy
-
-A convinient deploy script exists to help you deploy your in-development channel to your Roku device.
-
-To use it make sure you know the IP address and password of your development Roku device:
-
-```bash
-$ ./sideload.sh YOUR_DEVICE_PASSWORD YOUR_DEVICE_IP_ADDRESS
+```php
+# The dev username for the Roku
+ROKU_USERNAME=username
+# The dev password for the Roku
+ROKU_PASSWORD=password
 ```
+
+Change username and password to your dev Roku device credentials.

@@ -1,0 +1,9 @@
+import "pkg:/source/api/OwncastSDK.bs"
+
+sub init()
+    m.top.functionName = "getStreams"
+end sub
+
+sub getStreams()
+    m.top.responseBody = api.streams.get()
+end sub

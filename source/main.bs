@@ -1,0 +1,45 @@
+sub main (args as dynamic)
+
+    m.screen = CreateObject("roSGScreen")
+    m.port = CreateObject("roMessagePort")
+    m.screen.setMessagePort(m.port)
+
+    m.global = m.screen.getGlobalNode()
+
+    m.screen.createScene("baseScene")
+    m.screen.show()
+
+    m.global.addFields({ sceneManager: CreateObject("roSGNode", "SceneManager") })
+
+    m.global.sceneManager.callFunc("show", SceneCreator.MainScene())
+
+    while(true)
+        msg = wait(0, m.port)
+        msgType = type(msg)
+
+        if isStringEqual(msgType, "roSGNodeEvent")
+            if isStringEqual(msg.getField(), "selectedStream")
+                streamData = msg.getData()
+                if isValid(streamData)
+                    m.global.sceneManager.callFunc("show", SceneCreator.StreamDetails(streamData))
+                end if
+            end if
+
+            if isStringEqual(msg.getField(), "selectedButton")
+                buttonData = msg.getData()
+                if isChainValid(buttonData, "id")
+                    if isStringEqual(buttonData.id, "watchButton")
+                        currentScene = m.global.sceneManager.callFunc("getCurrent")
+                        if isChainValid(currentScene, "channelData")
+                            m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(currentScene.channelData))
+                        end if
+                    end if
+                end if
+            end if
+        end if
+
+        if isStringEqual(msgType, "roSGScreenEvent")
+            if msg.isScreenClosed() then return
+        end if
+    end while
+end sub

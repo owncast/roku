@@ -1,0 +1,106 @@
+' Returns whether or not passed value is valid
+function isValid(input as dynamic) as boolean
+    return input <> invalid
+end function
+
+' Returns whether or not passed string values are equal
+function isStringEqual(input1, input2) as boolean
+    if not isAllValid([input1, input2]) then return false
+    if type(input1) <> "roString" and type(input1) <> "String" then return false
+    if type(input2) <> "roString" and type(input2) <> "String" then return false
+
+    return LCase(input1) = LCase(input2)
+end function
+
+' Returns whether or not all items in passed array are valid
+function isAllValid(input as object) as boolean
+    for each item in input
+        if not isValid(item) then return false
+    end for
+    return true
+end function
+
+' isChainValid: Returns whether or not all the properties in the passed property chain are valid.
+' Stops evaluating at first found false value
+'
+' @param {dynamic} root - high-level object to test property chain against
+' @param {string} propertyPath - chain of properties under root object to test
+' @return {boolean} indicating if all properties in chain are valid
+function isChainValid(root as dynamic, propertyPath as string) as boolean
+    rootPath = root
+    properties = propertyPath.Split(".")
+
+    if not isValid(rootPath) then return false
+
+    ' Root path is valid, and no properties were passed. Return state of root
+    if properties.count() = 0 then return true
+    if properties[0] = "" then return true
+
+    rootPath = rootPath.LookupCI(properties[0])
+
+    if not isValid(rootPath) then return false
+
+    properties.shift()
+
+    if properties.count() <> 0
+        nextPath = properties.join(".")
+        return isChainValid(rootPath, nextPath)
+    end if
+
+    return true
+end function
+
+' chainLookup: Returns value from property chain using case insensitive lookups
+'
+' @param {dynamic} root - high-level object to test property chain against
+' @param {string} propertyPath - chain of properties under root object to test
+' @return {dynamic} value of requested item
+function chainLookup(root as dynamic, propertyPath as string) as dynamic
+    rootPath = root
+    properties = propertyPath.Split(".")
+
+    if not isValid(rootPath) then return rootPath
+
+    ' Root path is valid, and no properties were passed. Return root
+    if properties.count() = 0 then return rootPath
+    if properties[0] = "" then return rootPath
+
+    rootPath = rootPath.LookupCI(properties[0])
+    if not isValid(rootPath) then return invalid
+
+    properties.shift()
+
+    if properties.count() = 0 then return rootPath
+
+    nextPath = properties.join(".")
+    return chainLookup(rootPath, nextPath)
+end function
+
+' Search string array for search value. Return whether it's found
+function inArray(haystack as object, needle as dynamic) as boolean
+    valueToFind = needle
+
+    if LCase(type(valueToFind)) <> "rostring" and LCase(type(valueToFind)) <> "string"
+        valueToFind = str(needle)
+    end if
+
+    for each item in haystack
+        if isStringEqual(item, valueToFind) then return true
+    end for
+
+    return false
+end function
+
+' getJson: Makes a URL transfer request, returns parsed JSON return
+'
+' @param {string} url - URL to make request to
+'
+' @return {dynamic} returned JSON data from URL
+function getJson(url as string) as dynamic
+    request = CreateObject("roUrlTransfer")
+    request.SetCertificatesFile("common:/certs/ca-bundle.crt")
+    request.InitClientCertificates()
+    request.SetURL(url)
+
+    return ParseJson(request.GetToString())
+end function

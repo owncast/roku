@@ -1,0 +1,65 @@
+import "pkg:/source/Misc.bs"
+import "pkg:/source/enums/KeyCode.bs"
+
+sub init()
+    m.title = m.top.findNode("title")
+    m.subtitle = m.top.findNode("subtitle")
+    m.posterImage = m.top.findNode("posterImage")
+    m.tags = m.top.findNode("tags")
+    m.tags.font.size = 20
+
+    m.watchButton = m.top.findNode("watchButton")
+end sub
+
+sub onChannelDataChanged()
+    if not isValid(m.top.channelData) then return
+
+    if isValid(m.title)
+        if isChainValid(m.top.channelData, "title")
+            m.title.text = m.top.channelData.title
+        end if
+    end if
+
+    if isValid(m.subtitle)
+        if isChainValid(m.top.channelData, "secondarytitle")
+            m.subtitle.text = m.top.channelData.secondarytitle
+        end if
+    end if
+
+    if isValid(m.posterImage)
+        if isChainValid(m.top.channelData, "hdposterurl")
+            m.posterImage.uri = m.top.channelData.hdposterurl
+        end if
+    end if
+
+    if isValid(m.tags)
+        if isChainValid(m.top.channelData, "tags")
+            m.tags.text = `#${m.top.channelData.tags.join("  #")}`
+        end if
+    end if
+
+    ' If stream is offline, remove watch button
+    if isValid(m.watchButton)
+        if isChainValid(m.top.channelData, "live")
+            if not m.top.channelData.live
+                buttonParent = m.watchButton.getParent()
+                buttonParent.setFocus(true)
+                buttonParent.removeChild(m.watchButton)
+            end if
+        end if
+    end if
+end sub
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    if not press then return false
+
+    if isStringEqual(key, KeyCode.OK)
+        if m.watchButton.isInFocusChain()
+            m.top.selectedButton = m.watchButton
+            m.top.selectedButton = invalid
+            return true
+        end if
+    end if
+
+    return false
+end function

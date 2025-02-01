@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "brightscript",
+        "request": "launch",
+        "name": "BrightScript Debug: Launch",
+        "envFile": "${workspaceFolder}/.env",
+        "rootDir": "${workspaceFolder}/staging",
+        "username": "${env:ROKU_USERNAME}",
+        "password": "${env:ROKU_PASSWORD}",
+        "preLaunchTask": "build",
+      }
+    ]
+  }

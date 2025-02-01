@@ -1,40 +1,22 @@
-title=Owncasts
-
+# Channel Information
+title=Owncast
 major_version=1
-minor_version=1
-build_version=0
+minor_version=0
+build_version=1
 
-mm_icon_focus_hd=pkg:/images/owncast_roku_icon_focus_hd.png
-mm_icon_focus_fhd=pkg:/images/icon_focus_fhd.png
+# Channel Icon Images
+mm_icon_focus_fhd=pkg:/images/channelIcon.png
+mm_icon_focus_hd=pkg:/images/channelIcon.png
+mm_icon_focus_sd=pkg:/images/channelIcon.png
 
-bs_libs_required=roku_ads_lib
+# Splash Screen Images
+splash_screen_fhd=pkg:/images/splash.jpg
+splash_screen_hd=pkg:/images/splash.jpg
+splash_screen_sd=pkg:/images/splash.jpg
 
-splash_screen_fhd=pkg:/images/splash_fhd.jpg
-splash_screen_hd=pkg:/images/owncast_roku_splash_hd.jpg
-splash_color=#121212
+# Amount of time to display splash image.
+# 1 second = 1000
+splash_min_time=0
 
+# Comma separated list of resolutions the channel was designed to support
 ui_resolutions=hd
-
-supports_input_launch=1
-
-' Update content feed URL
-
-FEED_URL=https://directory.owncast.online/api/roku
-#FEED_URL=https://ovp-feeds2-886239521314.s3.amazonaws.com/roku_tips_and_tricks_clip/ovpfeed.json
-#FEED_URL=https://content.jwplatform.com/feeds/6V5vHuPm.rss
-
-' Update theme elements
-
-OverhangLogoUri=pkg:/images/owncast_roku_overhang_logo_hd.png
-#OverhangTitle=
-#OverhangTitleColor=
-#OverhangBackgroundUri=
-#OverhangBackgroundColor=
-
-#textColor=
-#focusRingColor=
-#progressBarColor=
-#busySpinnerColor=
-
-backgroundImageURI=pkg:/images/owncast_roku_background_hd.jpg
-#backgroundColor=

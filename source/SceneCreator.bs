@@ -1,0 +1,21 @@
+namespace SceneCreator
+    function MainScene() as object
+        scene = CreateObject("roSGNode", "mainscene")
+        scene.observeFieldScoped("selectedStream", m.port)
+        return scene
+    end function
+
+    function StreamDetails(channelData as object) as object
+        scene = CreateObject("roSGNode", "streamDetails")
+        scene.observeFieldScoped("selectedButton", m.port)
+
+        scene.channelData = channelData
+        return scene
+    end function
+
+    function PlayStream(streamData as object) as object
+        scene = CreateObject("roSGNode", "videoPlayer")
+        scene.videoContent = streamData
+        return scene
+    end function
+end namespace

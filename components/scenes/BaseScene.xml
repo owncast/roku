@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="baseScene" extends="Scene">
+    <children>
+        <Rectangle
+            height="720"
+            translation="[0, 0]"
+            color="#151724"
+            width="1280" />
+
+        <Poster
+            id="background"
+            height="720"
+            opacity=".3"
+            translation="[0, 0]"
+            uri="pkg:/images/background.jpg"
+            width="1280" />
+
+        <Poster
+            id="logo"
+            height="40"
+            translation="[40, 40]"
+            uri="pkg:/images/logo.png"
+            width="213" />
+
+        <Group id="body" />
+    </children>
+</component>

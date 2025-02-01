@@ -1,0 +1,101 @@
+import "pkg:/source/Misc.bs"
+import "pkg:/source/enums/TaskControl.bs"
+import "pkg:/source/enums/KeyCode.bs"
+
+sub init()
+    m.rowList = m.top.findNode("rowList")
+    m.rowlist.observeFieldScoped("rowItemFocused", "onRowItemFocusedChanged")
+
+    m.getStreamsTask = createObject("roSGNode", "GetStreams")
+    m.getStreamsTask.observeFieldScoped("responseBody", "onGetStreamsLoaded")
+    m.getStreamsTask.control = TaskControl.RUN
+end sub
+
+sub onGetStreamsLoaded()
+    m.getStreamsTask.unobserveFieldScoped("responseBody")
+    if not isValid(m.getStreamsTask.responseBody) then return
+
+    m.streams = m.getStreamsTask.responseBody
+    sortData()
+end sub
+
+sub sortData()
+    if not isChainValid(m.streams, "liveFeeds") then return
+
+    ' Channel sorting logic based on original code by @roadriverrail
+    channelsByTag = {
+        "now-live": { title: "Now Live", channels: createObject("RoSGNode", "ContentNode") },
+        "music": { title: "Music", channels: createObject("RoSGNode", "ContentNode") },
+        "tech": { title: "Tech", channels: createObject("RoSGNode", "ContentNode") },
+        "chatting": { title: "Chatting", channels: createObject("RoSGNode", "ContentNode") },
+        "video-games": { title: "Video Games", channels: createObject("RoSGNode", "ContentNode") },
+        "now-offline": { title: "Offline", channels: createObject("RoSGNode", "ContentNode") }
+    }
+
+    rowListContent = createObject("RoSGNode", "ContentNode")
+
+    for each feed in m.streams.liveFeeds
+        thisItemTags = feed.LookupCI("tags")
+
+        itemTitle = feed.LookupCI("title")
+        itemSecondaryTitle = feed.LookupCI("shortDescription")
+        itemHDPosterUrl = feed.LookupCI("thumbnail")
+        isLive = inArray(thisItemTags, "now-live")
+
+        itemContent = feed.LookupCI("content")
+        if isChainValid(itemContent, "videos")
+            if itemContent.videos.count() > 0
+                itemContent = itemContent.videos[0]
+            end if
+        end if
+
+        for each tag in thisItemTags
+            if channelsByTag.DoesExist(tag)
+                thisItem = createObject("RoSGNode", "ChannelData")
+                thisItem.live = isLive
+                thisItem.tags = thisItemTags
+                thisItem.title = itemTitle
+                thisItem.SecondaryTitle = itemSecondaryTitle
+                thisItem.HDPosterUrl = itemHDPosterUrl
+                thisItem.length = 0
+                if isChainValid(itemContent, "url")
+                    thisItem.url = itemContent.url
+                end if
+                channelsByTag[tag].channels.AppendChild(thisItem)
+            end if
+        end for
+    end for
+
+    for each tag in ["now-live", "music", "tech", "chatting", "video-games", "now-offline"]
+        if channelsByTag[tag].channels.count() = 0 then continue for
+
+        channelsByTag[tag].channels.title = channelsByTag[tag].title
+        rowListContent.AppendChild(channelsByTag[tag].channels)
+    end for
+
+    m.rowList.content = rowListContent
+    m.rowList.setFocus(true)
+end sub
+
+sub onRowItemFocusedChanged()
+    if isValid(m.itemInFocus)
+        m.itemInFocus.focus = false
+    end if
+
+    m.itemInFocus = m.rowList.content.getChild(m.rowList.rowItemFocused[0]).getChild(m.rowList.rowItemFocused[1])
+    if isValid(m.itemInFocus)
+        m.itemInFocus.focus = true
+    end if
+end sub
+
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    if isStringEqual(key, KeyCode.OK)
+        m.top.selectedStream = m.itemInFocus
+        ' Prevent double firing
+        m.top.selectedStream = invalid
+        return true
+    end if
+
+    return false
+end function

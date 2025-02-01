@@ -1,0 +1,15 @@
+import "pkg:/source/Misc.bs"
+import "pkg:/source/enums/KeyCode.bs"
+
+sub init()
+
+end sub
+
+function onKeyEvent(key as string, press as boolean) as boolean
+    if not press then return false
+
+    if isStringEqual(key, KeyCode.BACK)
+        m.global.sceneManager.callFunc("back")
+        return true
+    end if
+end function

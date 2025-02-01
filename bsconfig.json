@@ -1,0 +1,12 @@
+{
+    "files": [
+        "components/**/*.*",
+        "images/**/*.*",
+        "manifest",
+        "source/**/*.*"
+      ],
+    "stagingDir": "staging",
+    "retainStagingDir": true,
+    "autoImportComponentScript": true,
+    "sourceMap": true
+}

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<component name="ChannelItem" extends="Group">
+    <children>
+        <LayoutGroup layoutDirection="vert" vertAlignment="top" itemSpacings="20">
+            <Poster id="itemImage" width="200" height="133" />
+            <LayoutGroup layoutDirection="vert" vertAlignment="top" itemSpacings="5">
+                <Label id="itemText" horizAlign="left"
+                    font="font:MediumSystemFont" width="200" height="20" />
+                <ScrollingLabel id="itemSubText" horizAlign="left" repeatCount="0"
+                    font="font:SmallSystemFont" maxwidth="200" height="20" />
+            </LayoutGroup>
+        </LayoutGroup>
+
+        <Rectangle id="liveLabel" width="30" height="15" color="#0e3a67" visible="false"
+            translation="[170, 0]">
+            <Label id="liveText" horizAlign="right" text="LIVE"
+                font="font:SmallestBoldSystemFont" width="30" height="15" translation="[-2, 2]" />
+        </Rectangle>
+    </children>
+    <interface>
+        <field id="itemContent" type="node" onChange="itemContentChanged" />
+    </interface>
+</component>

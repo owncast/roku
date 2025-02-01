@@ -1,0 +1,13 @@
+import "pkg:/source/Misc.bs"
+import "pkg:/source/enums/KeyCode.bs"
+import "pkg:/source/enums/VideoControl.bs"
+
+sub init()
+    m.video = m.top.findNode("video")
+end sub
+
+sub onVideoContentChanged()
+    if not isValid(m.top.videoContent) then return
+    m.video.content = m.top.videoContent
+    m.video.control = VideoControl.Play
+end sub

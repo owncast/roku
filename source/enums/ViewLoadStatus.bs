@@ -1,0 +1,6 @@
+enum ViewLoadStatus
+    INIT
+    FIRSTLOAD
+    RELOAD
+    LOADED
+end enum

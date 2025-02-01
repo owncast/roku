@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="mainScene" extends="Group">
+    <children>
+        <RowList
+            id="rowList"
+            translation="[50, 110]"
+            itemComponentName="ChannelItem"
+            rowLabelOffset="[[0,20]]"
+            numRows="3"
+            itemSize="[1180, 250]"
+            itemSpacing="[0, 20]"
+            rowItemSize="[[200, 190]]"
+            rowItemSpacing="[[20, 0]]"
+            showRowLabel="[true]"
+            showRowCounter="[true]"
+            vertFocusAnimationStyle="fixedFocus"
+            rowFocusAnimationStyle="fixedFocusWrap" />
+    </children>
+    <interface>
+        <field id="selectedStream" type="node" alwaysNotify="true" />
+        <field id="finalFocus" type="node" />
+    </interface>
+</component>

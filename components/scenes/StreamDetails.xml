@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="streamDetails" extends="Group" initialFocus="watchButton">
+    <children>
+        <Label
+            id="title"
+            color="#ffc000"
+            font="font:LargeSystemFont"
+            translation="[50, 130]" />
+
+        <Label
+            id="subtitle"
+            translation="[50, 175]" />
+
+        <Label
+            id="tags"
+            color="#AAAAAA"
+            wrap="true"
+            width="1100"
+            numLines="2"
+            translation="[50, 215]" />
+
+        <Poster
+            id="posterImage"
+            height="225"
+            translation="[50, 300]"
+            width="400" />
+
+        <StandardButton id="watchButton" text="Watch" width="300" height="50" color="#222222"
+            translation="[500, 300]" />
+    </children>
+    <interface>
+        <field id="channelData" type="node" onchange="onChannelDataChanged" />
+        <field id="selectedButton" type="node" />
+        <field id="finalFocus" type="node" />
+    </interface>
+</component>

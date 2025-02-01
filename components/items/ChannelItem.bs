@@ -1,0 +1,24 @@
+sub init()
+    m.itemImage = m.top.findNode("itemImage")
+
+    m.liveLabel = m.top.findNode("liveLabel")
+    m.liveText = m.top.findNode("liveText")
+    m.liveText.font.size = 12
+
+    m.itemText = m.top.findNode("itemText")
+    m.itemText.font.size = 20
+
+    m.itemSubText = m.top.findNode("itemSubText")
+    m.itemSubText.font.size = 15
+end sub
+
+sub itemContentChanged()
+    itemData = m.top.itemContent
+    m.itemImage.uri = itemData.HDPosterUrl
+    m.itemText.text = itemData.title
+    m.itemSubText.text = itemData.SecondaryTitle
+
+    m.itemSubText.repeatCount = itemData.focus ? - 1 : 0
+    m.liveLabel.visible = itemData.live
+end sub
+
