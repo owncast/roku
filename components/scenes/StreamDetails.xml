@@ -5,11 +5,13 @@
             id="title"
             color="#ffc000"
             font="font:LargeSystemFont"
-            translation="[50, 130]" />
+            translation="[50, 130]"
+            width="1150" />
 
         <Label
             id="subtitle"
-            translation="[50, 175]" />
+            translation="[50, 175]"
+            width="1100" />
 
         <Label
             id="tags"

@@ -20,7 +20,7 @@ sub onGetStreamsLoaded()
 end sub
 
 sub sortData()
-    if not isChainValid(m.streams, "liveFeeds") then return
+    if not isChainValid(m.streams, "sections") then return
 
     ' Channel sorting logic based on original code by @roadriverrail
     channelsByTag = {
@@ -34,35 +34,34 @@ sub sortData()
 
     rowListContent = createObject("RoSGNode", "ContentNode")
 
-    for each feed in m.streams.liveFeeds
-        thisItemTags = feed.LookupCI("tags")
+    for each streamSection in m.streams.sections
+        if not isChainValid(streamSection, "instances") then continue for
 
-        itemTitle = feed.LookupCI("title")
-        itemSecondaryTitle = feed.LookupCI("shortDescription")
-        itemHDPosterUrl = feed.LookupCI("thumbnail")
-        isLive = inArray(thisItemTags, "now-live")
+        for each feed in streamSection.instances
+            thisItemTags = feed.LookupCI("tags")
 
-        itemContent = feed.LookupCI("content")
-        if isChainValid(itemContent, "videos")
-            if itemContent.videos.count() > 0
-                itemContent = itemContent.videos[0]
-            end if
-        end if
+            itemTitle = feed.LookupCI("name")
+            itemSecondaryTitle = getStreamTitle(feed)
+            itemHDPosterUrl = `${feed.LookupCI("url")}${feed.LookupCI("logo")}`
+            isLive = streamSection.LookupCI("online") ?? false
 
-        for each tag in thisItemTags
-            if channelsByTag.DoesExist(tag)
-                thisItem = createObject("RoSGNode", "ChannelData")
-                thisItem.live = isLive
-                thisItem.tags = thisItemTags
-                thisItem.title = itemTitle
-                thisItem.SecondaryTitle = itemSecondaryTitle
-                thisItem.HDPosterUrl = itemHDPosterUrl
-                thisItem.length = 0
-                if isChainValid(itemContent, "url")
-                    thisItem.url = itemContent.url
+            thisItemTags.push({
+                slug: isLive ? "now-live" : "now-offline"
+            })
+
+            for each tag in thisItemTags
+                if channelsByTag.DoesExist(tag.slug)
+                    thisItem = createObject("RoSGNode", "ChannelData")
+                    thisItem.live = isLive
+                    thisItem.tags = thisItemTags
+                    thisItem.title = itemTitle
+                    thisItem.SecondaryTitle = itemSecondaryTitle
+                    thisItem.HDPosterUrl = itemHDPosterUrl
+                    thisItem.length = 0
+                    thisItem.url = `${feed.LookupCI("url")}/hls/stream.m3u8`
+                    channelsByTag[tag.slug].channels.AppendChild(thisItem)
                 end if
-                channelsByTag[tag].channels.AppendChild(thisItem)
-            end if
+            end for
         end for
     end for
 
@@ -76,6 +75,25 @@ sub sortData()
     m.rowList.content = rowListContent
     m.rowList.setFocus(true)
 end sub
+
+function getStreamTitle(feed as object) as string
+
+    feedStreamTitle = feed.LookupCI("streamTitle")
+    if isvalid(feedStreamTitle)
+        if len(feedStreamTitle) > 0
+            return feedStreamTitle
+        end if
+    end if
+
+    feedStreamDescription = feed.LookupCI("description")
+    if isvalid(feedStreamDescription)
+        if len(feedStreamDescription) > 0
+            return feedStreamDescription
+        end if
+    end if
+
+    return ""
+end function
 
 sub onRowItemFocusedChanged()
     if isValid(m.itemInFocus)

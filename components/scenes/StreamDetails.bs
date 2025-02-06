@@ -34,7 +34,14 @@ sub onChannelDataChanged()
 
     if isValid(m.tags)
         if isChainValid(m.top.channelData, "tags")
-            m.tags.text = `#${m.top.channelData.tags.join("  #")}`
+            tagList = []
+            for each tag in m.top.channelData.tags
+                tagList.push(tag.slug)
+            end for
+
+            if tagList.count() > 0
+                m.tags.text = `#${tagList.join("  #")}`
+            end if
         end if
     end if
 

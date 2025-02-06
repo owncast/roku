@@ -5,5 +5,5 @@ sub init()
 end sub
 
 sub getStreams()
-    m.top.responseBody = api.streams.get()
+    m.top.responseBody = api.home.get()
 end sub

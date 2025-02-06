@@ -1,9 +1,9 @@
 import "pkg:/source/Misc.bs"
 
 namespace api
-    namespace streams
+    namespace home
         function get() as dynamic
-            return getJson(`https://directory.owncast.online/api/roku`)
+            return getJson(`https://directory.owncast.online/api/home`)
         end function
     end namespace
 end namespace
