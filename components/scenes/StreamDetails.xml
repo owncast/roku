@@ -25,7 +25,10 @@
             id="posterImage"
             height="225"
             translation="[50, 300]"
-            width="400" />
+            width="400"
+            loadWidth="225"
+            loadHeight="400"
+            loadDisplayMode="limitSize" />
 
         <StandardButton id="watchButton" text="Watch" width="300" height="50" color="#222222"
             translation="[500, 300]" />

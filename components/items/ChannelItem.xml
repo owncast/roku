@@ -3,7 +3,8 @@
 <component name="ChannelItem" extends="Group">
     <children>
         <LayoutGroup layoutDirection="vert" vertAlignment="top" itemSpacings="20">
-            <Poster id="itemImage" width="200" height="133" />
+            <Poster id="itemImage" width="200" height="133" loadWidth="200" loadHeight="133"
+                loadDisplayMode="limitSize" />
             <LayoutGroup layoutDirection="vert" vertAlignment="top" itemSpacings="5">
                 <Label id="itemText" horizAlign="left"
                     font="font:MediumSystemFont" width="200" height="20" />
