@@ -9,7 +9,7 @@ sub Init()
     'm.top.backgroundURI = "pkg:/images/splash_hd.png"
 
     m.top.ComponentController = m.top.findNode("ComponentController")
-    
+
     ' initialize default button bar
     m.top.buttonBar = CreateObject("roSGNode", "ButtonBar")
     m.top.buttonBar.visible = false
@@ -29,20 +29,20 @@ sub InputArgumentsReceived()
 end sub
 
 ' This function should be overridden
-sub Show(args as Object)
-    ? "please implement sub show(args) in your code in order to show any View"
+sub Show(args as object)
+
 end sub
 
 ' This function should be overridden
-sub Input(args as Object)
+sub Input(args as object)
     ?"SGDEX: Please implement 'sub Input(args)' in your scene to handle roInputEvent deep linking"
 end sub
 
-sub SceneSetTheme(event as Object)
+sub SceneSetTheme(event as object)
     m.top.actualThemeParameters = event.getData()
 end sub
 
-function onKeyEvent(key as String, press as Boolean) as Boolean
+function onKeyEvent(key as string, press as boolean) as boolean
     ' if back button is passed here View stack is done with Views operaion
     ' developer can override onKeyEvent to prevent closing channel and show exit dialog for example
     if press and key = "back"
@@ -57,6 +57,6 @@ end function
 
 'This is workaround for accessing scope of channel from framework library
 'callback for creating objects needed in library
-function createObjectOnDemand(value ) as Object
+function createObjectOnDemand(value) as object
     return CreateObject("roSGNode", value)
 end function
