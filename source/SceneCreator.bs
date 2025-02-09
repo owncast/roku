@@ -1,7 +1,10 @@
 namespace SceneCreator
-    function MainScene() as object
+    function MainScene(args as object) as object
         scene = CreateObject("roSGNode", "mainscene")
+        scene.args = args
         scene.observeFieldScoped("selectedStream", m.port)
+        scene.observeFieldScoped("deeplinkContent", m.port)
+
         return scene
     end function
 

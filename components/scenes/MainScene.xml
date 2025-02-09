@@ -18,6 +18,8 @@
     </children>
     <interface>
         <field id="selectedStream" type="node" alwaysNotify="true" />
+        <field id="deeplinkContent" type="node" />
         <field id="finalFocus" type="node" />
+        <field id="args" type="assocarray" />
     </interface>
 </component>

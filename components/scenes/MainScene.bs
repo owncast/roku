@@ -22,6 +22,8 @@ end sub
 sub sortData()
     if not isChainValid(m.streams, "sections") then return
 
+    deeplinkID = m.top.args.LookupCI("contentID") ?? "-99"
+
     ' Channel sorting logic based on original code by @roadriverrail
     channelsByTag = {
         "now-live": { title: "Now Live", channels: createObject("RoSGNode", "ContentNode") },
@@ -41,6 +43,7 @@ sub sortData()
             thisItemTags = feed.LookupCI("tags")
 
             itemTitle = feed.LookupCI("name")
+            itemID = feed.LookupCI("id").toStr()
             itemSecondaryTitle = getStreamTitle(feed)
             itemHDPosterUrl = `${feed.LookupCI("url")}${feed.LookupCI("logo")}`
             isLive = streamSection.LookupCI("online") ?? false
@@ -52,6 +55,7 @@ sub sortData()
             for each tag in thisItemTags
                 if channelsByTag.DoesExist(tag.slug)
                     thisItem = createObject("RoSGNode", "ChannelData")
+                    thisItem.id = itemID
                     thisItem.live = isLive
                     thisItem.tags = thisItemTags
                     thisItem.title = itemTitle
@@ -60,6 +64,11 @@ sub sortData()
                     thisItem.length = 0
                     thisItem.url = `${feed.LookupCI("url")}/hls/stream.m3u8`
                     channelsByTag[tag.slug].channels.AppendChild(thisItem)
+
+                    if isStringEqual(itemID, deeplinkID)
+                        m.top.deeplinkContent = thisItem
+                        deeplinkID = "-99"
+                    end if
                 end if
             end for
         end for
@@ -74,6 +83,8 @@ sub sortData()
 
     m.rowList.content = rowListContent
     m.rowList.setFocus(true)
+
+    m.top.signalBeacon("AppLaunchComplete")
 end sub
 
 function getStreamTitle(feed as object) as string

@@ -11,7 +11,7 @@ sub main (args as dynamic)
 
     m.global.addFields({ sceneManager: CreateObject("roSGNode", "SceneManager") })
 
-    m.global.sceneManager.callFunc("show", SceneCreator.MainScene())
+    m.global.sceneManager.callFunc("show", SceneCreator.MainScene(args))
 
     while(true)
         msg = wait(0, m.port)
@@ -22,6 +22,13 @@ sub main (args as dynamic)
                 streamData = msg.getData()
                 if isValid(streamData)
                     m.global.sceneManager.callFunc("show", SceneCreator.StreamDetails(streamData))
+                end if
+            end if
+
+            if isStringEqual(msg.getField(), "deeplinkContent")
+                streamData = msg.getData()
+                if isValid(streamData)
+                    m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(streamData))
                 end if
             end if
 
