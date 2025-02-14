@@ -31,9 +31,12 @@
             loadDisplayMode="limitSize" />
 
         <StandardButton id="watchButton" text="Watch" width="300" height="50" color="#222222"
-            translation="[500, 300]" />
+            focusBackground="#5441d9" translation="[500, 300]" />
+        <StandardButton id="favoriteButton" text="Add To Favorites" width="300" height="50"
+            color="#222222" focusBackground="#5441d9" translation="[500, 370]" />
     </children>
     <interface>
+        <function name="onShow" />
         <field id="channelData" type="node" onchange="onChannelDataChanged" />
         <field id="selectedButton" type="node" />
         <field id="finalFocus" type="node" />

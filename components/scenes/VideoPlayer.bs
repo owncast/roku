@@ -11,3 +11,6 @@ sub onVideoContentChanged()
     m.video.content = m.top.videoContent
     m.video.control = VideoControl.Play
 end sub
+
+sub onShow()
+end sub

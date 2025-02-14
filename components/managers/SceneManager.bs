@@ -21,6 +21,7 @@ sub show(newContent as object)
     end if
 
     newContent.setFocus(true)
+    newContent.callfunc("onShow")
 end sub
 
 sub back()
@@ -41,6 +42,8 @@ sub back()
     else
         newContent.setFocus(true)
     end if
+
+    newContent.callfunc("onShow")
 end sub
 
 function getCurrent() as object

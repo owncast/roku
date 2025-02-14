@@ -3,6 +3,7 @@
 <component name="ChannelData" extends="ContentNode">
     <interface>
         <field id="focus" type="boolean" />
+        <field id="isFavorite" type="boolean" />
         <field id="tags" type="array" />
     </interface>
 </component>

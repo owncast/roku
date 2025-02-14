@@ -7,6 +7,11 @@ sub init()
     m.rowlist.observeFieldScoped("rowItemFocused", "onRowItemFocusedChanged")
 
     m.getStreamsTask = createObject("roSGNode", "GetStreams")
+    m.refreshSceneContent = true
+    m.userFavorites = {}
+end sub
+
+sub onShow()
     m.getStreamsTask.observeFieldScoped("responseBody", "onGetStreamsLoaded")
     m.getStreamsTask.control = TaskControl.RUN
 end sub
@@ -21,11 +26,18 @@ end sub
 
 sub sortData()
     if not isChainValid(m.streams, "sections") then return
+    userFavorites = Registry.Get("favorites")
+
+    if not isStringEqual(m.userFavorites, formatJSON(userFavorites))
+        m.userFavorites = formatJSON(userFavorites)
+        m.refreshSceneContent = true
+    end if
 
     deeplinkID = m.top.args.LookupCI("contentID") ?? "-99"
 
     ' Channel sorting logic based on original code by @roadriverrail
     channelsByTag = {
+        "favorite": { title: "Favorites", channels: createObject("RoSGNode", "ContentNode") },
         "now-live": { title: "Now Live", channels: createObject("RoSGNode", "ContentNode") },
         "music": { title: "Music", channels: createObject("RoSGNode", "ContentNode") },
         "tech": { title: "Tech", channels: createObject("RoSGNode", "ContentNode") },
@@ -44,6 +56,7 @@ sub sortData()
 
             itemTitle = feed.LookupCI("name")
             itemID = feed.LookupCI("id").toStr()
+            isFavorite = userFavorites.LookupCI(itemID) ?? false
             itemSecondaryTitle = getStreamTitle(feed)
             itemHDPosterUrl = `${feed.LookupCI("url")}${feed.LookupCI("logo")}`
             isLive = streamSection.LookupCI("online") ?? false
@@ -51,6 +64,12 @@ sub sortData()
             thisItemTags.push({
                 slug: isLive ? "now-live" : "now-offline"
             })
+
+            if isFavorite
+                thisItemTags.push({
+                    slug: "favorite"
+                })
+            end if
 
             for each tag in thisItemTags
                 if channelsByTag.DoesExist(tag.slug)
@@ -62,6 +81,7 @@ sub sortData()
                     thisItem.SecondaryTitle = itemSecondaryTitle
                     thisItem.HDPosterUrl = itemHDPosterUrl
                     thisItem.length = 0
+                    thisItem.isFavorite = isFavorite
                     thisItem.url = `${feed.LookupCI("url")}/hls/stream.m3u8`
                     channelsByTag[tag.slug].channels.AppendChild(thisItem)
 
@@ -74,15 +94,19 @@ sub sortData()
         end for
     end for
 
-    for each tag in ["now-live", "music", "tech", "chatting", "video-games", "now-offline"]
-        if channelsByTag[tag].channels.count() = 0 then continue for
+    for each tag in ["favorite", "now-live", "music", "tech", "chatting", "video-games", "now-offline"]
+        if channelsByTag[tag].channels.getChildCount() = 0 then continue for
 
         channelsByTag[tag].channels.title = channelsByTag[tag].title
         rowListContent.AppendChild(channelsByTag[tag].channels)
     end for
 
-    m.rowList.content = rowListContent
-    m.rowList.setFocus(true)
+    if m.refreshSceneContent
+        m.rowList.content = rowListContent
+        m.rowList.setFocus(true)
+
+        m.refreshSceneContent = false
+    end if
 
     m.top.signalBeacon("AppLaunchComplete")
 end sub

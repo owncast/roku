@@ -17,6 +17,7 @@
             rowFocusAnimationStyle="fixedFocusWrap" />
     </children>
     <interface>
+        <function name="onShow" />
         <field id="selectedStream" type="node" alwaysNotify="true" />
         <field id="deeplinkContent" type="node" />
         <field id="finalFocus" type="node" />

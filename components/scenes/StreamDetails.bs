@@ -9,6 +9,12 @@ sub init()
     m.tags.font.size = 20
 
     m.watchButton = m.top.findNode("watchButton")
+    m.favoriteButton = m.top.findNode("favoriteButton")
+
+    m.watchButton.focus = true
+end sub
+
+sub onShow()
 end sub
 
 sub onChannelDataChanged()
@@ -55,6 +61,20 @@ sub onChannelDataChanged()
             end if
         end if
     end if
+
+    if isValid(m.favoriteButton)
+        if isChainValid(m.top.channelData, "isFavorite")
+            processFavoriteButton()
+        end if
+    end if
+end sub
+
+sub toggleFavorite()
+    m.top.channelData.isFavorite = not m.top.channelData.isFavorite
+end sub
+
+sub processFavoriteButton()
+    m.favoriteButton.text = m.top.channelData.isFavorite ? "Remove From Favorites" : "Add To Favorites"
 end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
@@ -64,6 +84,32 @@ function onKeyEvent(key as string, press as boolean) as boolean
         if m.watchButton.isInFocusChain()
             m.top.selectedButton = m.watchButton
             m.top.selectedButton = invalid
+            return true
+        end if
+
+        if m.favoriteButton.isInFocusChain()
+            toggleFavorite()
+            processFavoriteButton()
+            m.top.selectedButton = m.favoriteButton
+            m.top.selectedButton = invalid
+            return true
+        end if
+    end if
+
+    if isStringEqual(key, KeyCode.DOWN)
+        if m.watchButton.isInFocusChain()
+            m.watchButton.focus = false
+            m.favoriteButton.focus = true
+            m.favoriteButton.setFocus(true)
+            return true
+        end if
+    end if
+
+    if isStringEqual(key, KeyCode.UP)
+        if m.favoriteButton.isInFocusChain()
+            m.watchButton.focus = true
+            m.favoriteButton.focus = false
+            m.watchButton.setFocus(true)
             return true
         end if
     end if

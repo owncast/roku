@@ -104,3 +104,15 @@ function getJson(url as string) as dynamic
 
     return ParseJson(request.GetToString())
 end function
+
+namespace Registry
+    function Get(sectionName as string) as object
+        registrySection = CreateObject("roRegistrySection", sectionName)
+        return registrySection.Exists(sectionName) ? ParseJson(registrySection.Read(sectionName)) : {}
+    end function
+
+    function Set(sectionName as string, data as object) as object
+        registrySection = CreateObject("roRegistrySection", sectionName)
+        return registrySection.Write(sectionName, FormatJson(data))
+    end function
+end namespace

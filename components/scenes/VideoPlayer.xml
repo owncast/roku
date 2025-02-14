@@ -9,6 +9,7 @@
         />
     </children>
     <interface>
+        <function name="onShow" />
         <field id="videoContent" type="node" onchange="onVideoContentChanged" />
     </interface>
 </component>
