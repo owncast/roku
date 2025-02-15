@@ -1,24 +1,24 @@
 ' ********** Copyright 2019 Roku Corp.  All Rights Reserved. **********
 
-sub Show(args as Object)
-	AppInfo = CreateObject("roAppInfo")
+sub Show(args as object)
+    AppInfo = CreateObject("roAppInfo")
 
-' update theme elements
-	m.top.theme = {
+    ' update theme elements
+    m.top.theme = {
         global: {
-        	OverhangLogoUri: AppInfo.GetValue("OverhangLogoUri")
-            OverhangTitle: AppInfo.GetValue("OverhangTitle")	 		
-            OverhangTitleColor: AppInfo.GetValue("OverhangTitleColor")		
-            OverhangBackgroundUri: AppInfo.GetValue("OverhangBackgroundUri")		
-            OverhangBackgroundColor: AppInfo.GetValue("OverhangBackgroundColor")	
+            OverhangLogoUri: AppInfo.GetValue("OverhangLogoUri")
+            OverhangTitle: AppInfo.GetValue("OverhangTitle")
+            OverhangTitleColor: AppInfo.GetValue("OverhangTitleColor")
+            OverhangBackgroundUri: AppInfo.GetValue("OverhangBackgroundUri")
+            OverhangBackgroundColor: AppInfo.GetValue("OverhangBackgroundColor")
 
-    
+
             textColor: AppInfo.GetValue("textColor")
             focusRingColor: AppInfo.GetValue("focusRingColor")
             progressBarColor: AppInfo.GetValue("progressBarColor")
-			busySpinnerColor: AppInfo.GetValue("busySpinnerColor")                  
+            busySpinnerColor: AppInfo.GetValue("busySpinnerColor")
 
-           	backgroundImageURI: AppInfo.GetValue("backgroundImageURI") 
+            backgroundImageURI: AppInfo.GetValue("backgroundImageURI")
             backgroundColor: AppInfo.GetValue("backgroundColor")
         }
     }
@@ -44,13 +44,18 @@ sub Show(args as Object)
     })
 
     if IsDeepLinking(args)
-        PerformDeepLinking(args)
+        m.args = args
+        m.grid.ObserveField("content", "onGridContentSet")
     end if
 
     m.top.signalBeacon("AppLaunchComplete")
 end sub
 
-sub OnGridItemSelected(event as Object)
+sub onGridContentSet()
+    PerformDeepLinking(m.args, m.grid.content)
+end sub
+
+sub OnGridItemSelected(event as object)
     grid = event.GetRoSGNode()
     selectedIndex = event.GetData()
 
@@ -65,7 +70,7 @@ sub OnGridItemSelected(event as Object)
     detailsView.ObserveField("wasClosed", "OnDetailsWasClosed")
 end sub
 
-sub OnDetailsWasClosed(event as Object)
+sub OnDetailsWasClosed(event as object)
     details = event.GetRoSGNode()
     if details.content.favoriteUpdated = true
         content = CreateObject("roSGNode", "ContentNode")
@@ -83,6 +88,6 @@ end sub
 sub Input(args as object)
     ' handle roInput event deep linking
     if IsDeepLinking(args)
-        PerformDeepLinking(args)
+        PerformDeepLinking(args, m.grid.content)
     end if
 end sub

@@ -1,8 +1,27 @@
-function IsDeepLinking(args as Object)
+function IsDeepLinking(args as object)
     ' check if deep linking args is valid
-    return args <> invalid and args.mediaType <> invalid and args.mediaType <> "" and args.contentId <> invalid and args.contentId <> "" 
+    return args <> invalid and args.mediaType <> invalid and args.mediaType <> "" and args.contentId <> invalid and args.contentId <> ""
 end function
 
-sub PerformDeepLinking(args as Object)
-    ' Implement your deep linking logic. For more details, please see Roku_Recommends sample.
+sub PerformDeepLinking(args as object, pageContent as object)
+    for each contentRow in pageContent.getChildren(-1, 0)
+        for each contentItem in contentRow.getChildren(-1, 0)
+            if contentItem.id = args.contentID
+                showVideo(contentItem)
+                exit for
+            end if
+        end for
+    end for
+end sub
+
+sub showVideo(contentItem as object)
+    video = CreateObject("roSGNode", "MediaView")
+    video.content = contentItem
+    video.jumpToItem = 0
+    video.isContentList = false
+    video.control = "play"
+
+    m.top.ComponentController.CallFunc("show", {
+        view: video
+    })
 end sub
