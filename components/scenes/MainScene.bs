@@ -3,6 +3,7 @@ import "pkg:/source/enums/TaskControl.bs"
 import "pkg:/source/enums/KeyCode.bs"
 
 sub init()
+    m.AppLaunchBeaconSent = false
     m.rowList = m.top.findNode("rowList")
     m.rowlist.observeFieldScoped("rowItemFocused", "onRowItemFocusedChanged")
 
@@ -108,7 +109,10 @@ sub sortData()
         m.refreshSceneContent = false
     end if
 
-    m.top.signalBeacon("AppLaunchComplete")
+    if not m.AppLaunchBeaconSent
+        m.top.signalBeacon("AppLaunchComplete")
+        m.AppLaunchBeaconSent = true
+    end if
 end sub
 
 function getStreamTitle(feed as object) as string
