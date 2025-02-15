@@ -4,9 +4,16 @@ function IsDeepLinking(args as object)
 end function
 
 sub PerformDeepLinking(args as object, pageContent as object)
+    if m.deepLinkingHandled = invalid
+        m.deepLinkingHandled = false
+    end if
+
+    if m.deepLinkingHandled then return
+
     for each contentRow in pageContent.getChildren(-1, 0)
         for each contentItem in contentRow.getChildren(-1, 0)
             if contentItem.id = args.contentID
+                m.deepLinkingHandled = true
                 showVideo(contentItem)
                 exit for
             end if
