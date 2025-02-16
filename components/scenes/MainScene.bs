@@ -27,7 +27,7 @@ end sub
 
 sub sortData()
     if not isChainValid(m.streams, "sections") then return
-    userFavorites = Registry.Get("favorites")
+    userFavorites = Registry.Get("Favorites")
 
     if not isStringEqual(m.userFavorites, formatJSON(userFavorites))
         m.userFavorites = formatJSON(userFavorites)

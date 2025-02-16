@@ -46,14 +46,14 @@ sub main (args as dynamic)
                         currentScene = m.global.sceneManager.callFunc("getCurrent")
                         if isChainValid(currentScene, "channelData")
                             isFavorite = currentScene.channelData.LookupCI("isFavorite")
-                            userFavorites = Registry.Get("favorites")
+                            userFavorites = Registry.Get("Favorites")
                             if isFavorite
                                 userFavorites.AddReplace(currentScene.channelData.LookupCI("id"), currentScene.channelData.LookupCI("isFavorite"))
                             else
                                 userFavorites.Delete(currentScene.channelData.LookupCI("id"))
                             end if
 
-                            Registry.Set("favorites", userFavorites)
+                            Registry.Set("Favorites", userFavorites)
                         end if
                     end if
                 end if
