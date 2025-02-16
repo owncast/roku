@@ -56,8 +56,16 @@ sub onChannelDataChanged()
         if isChainValid(m.top.channelData, "live")
             if not m.top.channelData.live
                 buttonParent = m.watchButton.getParent()
-                buttonParent.setFocus(true)
-                buttonParent.removeChild(m.watchButton)
+                if isValid(buttonParent)
+                    buttonParent.removeChild(m.watchButton)
+                end if
+
+                if isValid(m.favoriteButton)
+                    m.favoriteButton.focus = true
+                    m.favoriteButton.setFocus(true)
+                else
+                    buttonParent.setFocus(true)
+                end if
             end if
         end if
     end if
