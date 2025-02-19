@@ -1,6 +1,7 @@
 import "pkg:/source/Misc.bs"
-import "pkg:/source/enums/TaskControl.bs"
+import "pkg:/source/enums/Constant.bs"
 import "pkg:/source/enums/KeyCode.bs"
+import "pkg:/source/enums/TaskControl.bs"
 
 sub init()
     m.AppLaunchBeaconSent = false
@@ -34,7 +35,7 @@ sub sortData()
         m.refreshSceneContent = true
     end if
 
-    deeplinkID = m.top.args.LookupCI("contentID") ?? "-99"
+    deeplinkID = m.top.args.LookupCI("contentID") ?? Constant.UNUSEDCONTENTID
 
     ' Channel sorting logic based on original code by @roadriverrail
     channelsByTag = {
@@ -88,7 +89,7 @@ sub sortData()
 
                     if isStringEqual(itemID, deeplinkID)
                         m.top.deeplinkContent = thisItem
-                        deeplinkID = "-99"
+                        deeplinkID = Constant.UNUSEDCONTENTID
                     end if
                 end if
             end for
