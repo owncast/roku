@@ -6,4 +6,10 @@ namespace api
             return getJson(`https://directory.owncast.online/api/home`)
         end function
     end namespace
+
+    namespace image
+        function getThumbnailURL(streamID as string) as dynamic
+            return `https://directory.owncast.online/api/image/thumb/${streamID}?cachebuster=${Rnd(100000)}`
+        end function
+    end namespace
 end namespace
