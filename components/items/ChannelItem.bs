@@ -1,5 +1,9 @@
+import "pkg:/source/Misc.bs"
+import "pkg:/source/enums/PosterLoadStatus.bs"
+
 sub init()
     m.itemImage = m.top.findNode("itemImage")
+    m.itemImage.observeFieldScoped("loadStatus", "onLoadStatusChange")
 
     m.liveLabel = m.top.findNode("liveLabel")
     m.liveText = m.top.findNode("liveText")
@@ -12,13 +16,29 @@ sub init()
     m.itemSubText.font.size = 15
 end sub
 
+sub onLoadStatusChange()
+    if isStringEqual(m.itemImage.loadStatus, PosterLoadStatus.LOADING) then return
+
+    if isStringEqual(m.itemImage.loadStatus, PosterLoadStatus.READY) then m.itemImage.unobserveFieldScoped("loadStatus")
+
+    if isStringEqual(m.itemImage.loadStatus, PosterLoadStatus.FAILED)
+        if isStringEqual(m.itemImage.uri, m.top.itemContent.thumbnailImageURI)
+            m.itemImage.uri = m.top.itemContent.logoImageURI
+            return
+        end if
+    end if
+
+    m.itemImage.unobserveFieldScoped("loadStatus")
+end sub
+
 sub itemContentChanged()
     itemData = m.top.itemContent
-    m.itemImage.uri = itemData.HDPosterUrl
+
     m.itemText.text = itemData.title
     m.itemSubText.text = itemData.SecondaryTitle
-
     m.itemSubText.repeatCount = itemData.focus ? - 1 : 0
     m.liveLabel.visible = itemData.live
+
+    m.itemImage.uri = itemData.live ? itemData.thumbnailImageURI : itemData.logoImageURI
 end sub
 
