@@ -1,10 +1,13 @@
 import "pkg:/source/Misc.bs"
 import "pkg:/source/enums/KeyCode.bs"
+import "pkg:/source/enums/PosterLoadStatus.bs"
 
 sub init()
     m.title = m.top.findNode("title")
     m.subtitle = m.top.findNode("subtitle")
     m.posterImage = m.top.findNode("posterImage")
+    m.posterImage.observeFieldScoped("loadStatus", "onLoadStatusChange")
+
     m.tags = m.top.findNode("tags")
     m.tags.font.size = 20
 
@@ -33,8 +36,12 @@ sub onChannelDataChanged()
     end if
 
     if isValid(m.posterImage)
-        if isChainValid(m.top.channelData, "hdposterurl")
-            m.posterImage.uri = m.top.channelData.hdposterurl
+        if not isChainValid(m.top.channelData, "live")
+            m.posterImage.uri = m.top.channelData.logoImageURI
+        else
+            if isChainValid(m.top.channelData, "thumbnailImageURI") and isChainValid(m.top.channelData, "logoImageURI")
+                m.posterImage.uri = m.top.channelData.live ? m.top.channelData.thumbnailImageURI : m.top.channelData.logoImageURI
+            end if
         end if
     end if
 
@@ -75,6 +82,21 @@ sub onChannelDataChanged()
             processFavoriteButton()
         end if
     end if
+end sub
+
+sub onLoadStatusChange()
+    if isStringEqual(m.posterImage.loadStatus, PosterLoadStatus.LOADING) then return
+
+    if isStringEqual(m.posterImage.loadStatus, PosterLoadStatus.READY) then m.posterImage.unobserveFieldScoped("loadStatus")
+
+    if isStringEqual(m.posterImage.loadStatus, PosterLoadStatus.FAILED)
+        if isStringEqual(m.posterImage.uri, m.top.channelData.thumbnailImageURI)
+            m.posterImage.uri = m.top.channelData.logoImageURI
+            return
+        end if
+    end if
+
+    m.posterImage.unobserveFieldScoped("loadStatus")
 end sub
 
 sub toggleFavorite()
