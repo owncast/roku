@@ -24,6 +24,15 @@ sub show(newContent as object)
     newContent.callfunc("onShow")
 end sub
 
+sub dialog(dialogContent as object)
+    currentScene = m.sceneList.peek()
+    if isValid(currentScene)
+        currentScene.finalFocus = currentScene.focusedChild
+    end if
+
+    m.currentScene.dialog = dialogContent
+end sub
+
 sub back()
     m.sceneList.pop()
 

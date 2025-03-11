@@ -8,10 +8,13 @@ sub init()
     m.AppLaunchBeaconSent = false
     m.rowList = m.top.findNode("rowList")
     m.rowlist.observeFieldScoped("rowItemFocused", "onRowItemFocusedChanged")
+    m.rowlist.observeFieldScoped("rowItemSelected", "onRowItemSelectedChanged")
 
+    m.getStreamDataTask = createObject("roSGNode", "GetStreamData")
     m.getStreamsTask = createObject("roSGNode", "GetStreams")
     m.refreshSceneContent = true
     m.userFavorites = {}
+    m.userConnectedServers = {}
 end sub
 
 sub onShow()
@@ -30,9 +33,15 @@ end sub
 sub sortData()
     if not isChainValid(m.streams, "sections") then return
     userFavorites = Registry.Get("Favorites")
+    userConnectedServers = Registry.Get("ConnectedServers")
 
     if not isStringEqual(m.userFavorites, formatJSON(userFavorites))
         m.userFavorites = formatJSON(userFavorites)
+        m.refreshSceneContent = true
+    end if
+
+    if not isStringEqual(m.userConnectedServers, formatJSON(userConnectedServers))
+        m.userConnectedServers = formatJSON(userConnectedServers)
         m.refreshSceneContent = true
     end if
 
@@ -42,6 +51,7 @@ sub sortData()
     channelsByTag = {
         "favorite": { title: "Favorites", channels: createObject("RoSGNode", "ContentNode") },
         "now-live": { title: "Now Live", channels: createObject("RoSGNode", "ContentNode") },
+        "connected": { title: "Manually Added Owncast Live Streams", channels: createObject("RoSGNode", "ContentNode") },
         "music": { title: "Music", channels: createObject("RoSGNode", "ContentNode") },
         "tech": { title: "Tech", channels: createObject("RoSGNode", "ContentNode") },
         "chatting": { title: "Chatting", channels: createObject("RoSGNode", "ContentNode") },
@@ -50,6 +60,36 @@ sub sortData()
     }
 
     rowListContent = createObject("RoSGNode", "ContentNode")
+
+    thisItem = createObject("RoSGNode", "ChannelData")
+    thisItem.id = "connectToServer"
+    thisItem.title = "Add Owncast Live Stream"
+    thisItem.SecondaryTitle = ""
+    thisItem.logoImageURI = "pkg:/images/icons/computerConnect.png"
+    channelsByTag["connected"].channels.AppendChild(thisItem)
+
+    streamList = []
+
+    if isChainValid(userConnectedServers, "serverlist")
+        for each feed in userConnectedServers.LookupCI("serverlist")
+            thisItem = createObject("RoSGNode", "ChannelData")
+            thisItem.isConnectedServer = true
+            thisItem.id = feed.LookupCI("url")
+            thisItem.url = `${feed.LookupCI("url")}/hls/stream.m3u8`
+            thisItem.thumbnailImageURI = api.server.getThumbnailURL(feed.LookupCI("url"))
+            thisItem.live = false
+
+            streamList.push({
+                node: thisItem,
+                url: feed.LookupCI("url")
+            })
+
+            channelsByTag["connected"].channels.AppendChild(thisItem)
+        end for
+    end if
+
+    m.getStreamDataTask.streamList = streamList
+    m.getStreamDataTask.control = TaskControl.RUN
 
     for each streamSection in m.streams.sections
         if not isChainValid(streamSection, "instances") then continue for
@@ -99,7 +139,7 @@ sub sortData()
         end for
     end for
 
-    for each tag in ["favorite", "now-live", "music", "tech", "chatting", "video-games", "now-offline"]
+    for each tag in ["favorite", "now-live", "connected", "music", "tech", "chatting", "video-games", "now-offline"]
         if channelsByTag[tag].channels.getChildCount() = 0 then continue for
 
         channelsByTag[tag].channels.title = channelsByTag[tag].title
@@ -149,14 +189,13 @@ sub onRowItemFocusedChanged()
     end if
 end sub
 
+sub onRowItemSelectedChanged()
+    m.top.selectedStream = m.rowList.content.getChild(m.rowList.rowItemSelected[0]).getChild(m.rowList.rowItemSelected[1])
+
+    ' Prevent double firing
+    m.top.selectedStream = invalid
+end sub
 
 function onKeyEvent(key as string, press as boolean) as boolean
-    if isStringEqual(key, KeyCode.OK)
-        m.top.selectedStream = m.itemInFocus
-        ' Prevent double firing
-        m.top.selectedStream = invalid
-        return true
-    end if
-
     return false
 end function

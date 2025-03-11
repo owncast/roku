@@ -102,7 +102,11 @@ function getJson(url as string) as dynamic
     request.InitClientCertificates()
     request.SetURL(url)
 
-    return ParseJson(request.GetToString())
+    result = request.GetToString()
+
+    if len(result) = 0 return invalid
+
+    return ParseJson(result)
 end function
 
 namespace Registry

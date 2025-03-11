@@ -13,6 +13,7 @@ sub init()
 
     m.watchButton = m.top.findNode("watchButton")
     m.favoriteButton = m.top.findNode("favoriteButton")
+    m.disconnectButton = m.top.findNode("disconnectButton")
 
     m.watchButton.focus = true
 end sub
@@ -65,6 +66,7 @@ sub onChannelDataChanged()
                 buttonParent = m.watchButton.getParent()
                 if isValid(buttonParent)
                     buttonParent.removeChild(m.watchButton)
+                    m.watchButton = invalid
                 end if
 
                 if isValid(m.favoriteButton)
@@ -77,10 +79,36 @@ sub onChannelDataChanged()
         end if
     end if
 
+    ' If stream is not a connected server, remove disconnect button
+    if isValid(m.disconnectButton)
+        if isChainValid(m.top.channelData, "isConnectedServer")
+            if not m.top.channelData.isConnectedServer
+                removeDisconnectButton()
+            end if
+        end if
+    end if
+
     if isValid(m.favoriteButton)
         if isChainValid(m.top.channelData, "isFavorite")
             processFavoriteButton()
         end if
+    end if
+end sub
+
+sub removeDisconnectButton()
+    if m.disconnectButton.isInFocusChain()
+        if isValid(m.favoriteButton)
+            m.favoriteButton.focus = true
+            m.favoriteButton.setFocus(true)
+        else
+            buttonParent.setFocus(true)
+        end if
+    end if
+
+    buttonParent = m.disconnectButton.getParent()
+    if isValid(buttonParent)
+        buttonParent.removeChild(m.disconnectButton)
+        m.disconnectButton = invalid
     end if
 end sub
 
@@ -111,10 +139,21 @@ function onKeyEvent(key as string, press as boolean) as boolean
     if not press then return false
 
     if isStringEqual(key, KeyCode.OK)
-        if m.watchButton.isInFocusChain()
-            m.top.selectedButton = m.watchButton
-            m.top.selectedButton = invalid
-            return true
+        if isValid(m.watchButton)
+            if m.watchButton.isInFocusChain()
+                m.top.selectedButton = m.watchButton
+                m.top.selectedButton = invalid
+                return true
+            end if
+        end if
+
+        if isValid(m.disconnectButton)
+            if m.disconnectButton.isInFocusChain()
+                m.top.selectedButton = m.disconnectButton
+                m.top.selectedButton = invalid
+                removeDisconnectButton()
+                return true
+            end if
         end if
 
         if m.favoriteButton.isInFocusChain()
@@ -127,16 +166,38 @@ function onKeyEvent(key as string, press as boolean) as boolean
     end if
 
     if isStringEqual(key, KeyCode.DOWN)
-        if m.watchButton.isInFocusChain()
-            m.watchButton.focus = false
-            m.favoriteButton.focus = true
-            m.favoriteButton.setFocus(true)
-            return true
+        if isValid(m.watchButton)
+            if m.watchButton.isInFocusChain()
+                m.watchButton.focus = false
+                m.favoriteButton.focus = true
+                m.favoriteButton.setFocus(true)
+                return true
+            end if
+        end if
+
+        if isValid(m.disconnectButton)
+            if m.favoriteButton.isInFocusChain()
+                m.favoriteButton.focus = false
+                m.disconnectButton.focus = true
+                m.disconnectButton.setFocus(true)
+                return true
+            end if
         end if
     end if
 
     if isStringEqual(key, KeyCode.UP)
+        if isValid(m.disconnectButton)
+            if m.disconnectButton.isInFocusChain()
+                m.favoriteButton.focus = true
+                m.disconnectButton.focus = false
+                m.favoriteButton.setFocus(true)
+                return true
+            end if
+        end if
+
         if m.favoriteButton.isInFocusChain()
+            if not isValid(m.watchButton) return false
+
             m.watchButton.focus = true
             m.favoriteButton.focus = false
             m.watchButton.setFocus(true)

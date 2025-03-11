@@ -1,0 +1,29 @@
+import "pkg:/source/api/OwncastSDK.bs"
+
+sub init()
+    m.top.functionName = "getStreamData"
+end sub
+
+sub getStreamData()
+    for each stream in m.top.streamList
+        instanceData = api.server.instance(stream.LookupCI("url"))
+        statusData = api.server.status(stream.LookupCI("url"))
+
+        ' Fallback to config API endpoint in attempt to get stream data
+        if not isValid(instanceData)
+            instanceData = api.server.config(stream.LookupCI("url"))
+        end if
+
+        if isValid(instanceData)
+            stream.node.logoImageURI = instanceData.LookupCI("thumbnail")
+            stream.node.title = instanceData.LookupCI("title") ?? instanceData.LookupCI("name")
+        else
+            stream.node.title = stream.LookupCI("url")
+        end if
+
+        if isValid(statusData)
+            stream.node.live = statusData.LookupCI("online")
+            stream.node.SecondaryTitle = statusData.LookupCI("streamTitle")
+        end if
+    end for
+end sub

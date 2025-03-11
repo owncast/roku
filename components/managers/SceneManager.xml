@@ -3,6 +3,7 @@
     <interface>
         <function name="back" />
         <function name="getCurrent" />
+        <function name="dialog" />
         <function name="show" />
     </interface>
 </component>
