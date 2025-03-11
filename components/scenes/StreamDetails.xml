@@ -34,6 +34,8 @@
             focusBackground="#5441d9" translation="[500, 300]" />
         <StandardButton id="favoriteButton" text="Add To Favorites" width="300" height="50"
             color="#222222" focusBackground="#5441d9" translation="[500, 370]" />
+        <StandardButton id="disconnectButton" text="Disconnect Server" width="300" height="50"
+            color="#222222" focusBackground="#5441d9" translation="[500, 440]" />
     </children>
     <interface>
         <function name="onShow" />

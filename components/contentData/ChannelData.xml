@@ -3,9 +3,11 @@
 <component name="ChannelData" extends="ContentNode">
     <interface>
         <field id="focus" type="boolean" />
+        <field id="id" type="string" />
         <field id="logoImageURI" type="string" />
         <field id="thumbnailImageURI" type="string" />
         <field id="isFavorite" type="boolean" />
+        <field id="isConnectedServer" type="boolean" />
         <field id="tags" type="array" />
     </interface>
 </component>

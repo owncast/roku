@@ -1,0 +1,10 @@
+namespace DialogCreator
+    function KeyboardInput(id as string) as object
+        dialog = CreateObject("roSGNode", "StandardKeyboardDialog")
+        dialog.observeFieldScoped("buttonSelected", m.port)
+        dialog.observeFieldScoped("wasClosed", m.port)
+        dialog.id = id
+        dialog.buttons = ["Connect", "Cancel"]
+        return dialog
+    end function
+end namespace

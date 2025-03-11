@@ -20,8 +20,12 @@ sub main (args as dynamic)
         if isStringEqual(msgType, "roSGNodeEvent")
             if isStringEqual(msg.getField(), "selectedStream")
                 streamData = msg.getData()
-                if isValid(streamData)
-                    m.global.sceneManager.callFunc("show", SceneCreator.StreamDetails(streamData))
+                if isChainValid(streamData, "id")
+                    if isStringEqual(streamData.LookupCI("id"), "connectToServer")
+                        m.global.sceneManager.callFunc("dialog", DialogCreator.KeyboardInput("connectToServer"))
+                    else
+                        m.global.sceneManager.callFunc("show", SceneCreator.StreamDetails(streamData))
+                    end if
                 end if
             end if
 
@@ -30,6 +34,23 @@ sub main (args as dynamic)
                 if isValid(streamData)
                     m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(streamData))
                 end if
+            end if
+
+            if isStringEqual(msg.getField(), "buttonSelected")
+                currentScene = m.global.sceneManager.callFunc("getCurrent")
+                scene = currentScene.getScene()
+
+                dialogReturnData = {
+                    id: scene.dialog.id,
+                    buttonSelected: scene.dialog.buttons[scene.dialog.buttonSelected],
+                    indexSelected: scene.dialog.buttonSelected,
+                    text: scene.dialog.text
+                }
+
+                scene.dialog.close = true
+
+                connectToServer(dialogReturnData)
+                currentScene.callfunc("onShow")
             end if
 
             if isStringEqual(msg.getField(), "selectedButton")
@@ -56,6 +77,10 @@ sub main (args as dynamic)
                             Registry.Set("Favorites", userFavorites)
                         end if
                     end if
+
+                    if isStringEqual(buttonData.id, "disconnectButton")
+                        disconnectServer()
+                    end if
                 end if
             end if
         end if
@@ -64,4 +89,43 @@ sub main (args as dynamic)
             if msg.isScreenClosed() then return
         end if
     end while
+end sub
+
+sub disconnectServer()
+    currentScene = m.global.sceneManager.callFunc("getCurrent")
+    if not isChainValid(currentScene, "channelData.id") then return
+
+    userConnectedServers = Registry.Get("ConnectedServers")
+    if not isChainValid(userConnectedServers, "serverlist") then return
+
+    for i = 0 to userConnectedServers.LookupCI("serverlist").count()
+        if isStringEqual(userConnectedServers.LookupCI("serverlist")[i].LookupCI("url"), currentScene.channelData.LookupCI("id"))
+            userConnectedServers.LookupCI("serverlist").Delete(i)
+            Registry.Set("ConnectedServers", userConnectedServers)
+            exit for
+        end if
+    end for
+end sub
+
+sub connectToServer(dialogReturnData as object)
+    enteredURL = dialogReturnData.LookupCI("text")
+
+    ' Remove trailing slash
+    if Right(enteredURL, 1) = "/"
+        enteredURL = Left(enteredURL, Len(enteredURL) - 1)
+    end if
+
+    saveServerData(enteredURL)
+end sub
+
+sub saveServerData(serverURL as string)
+    userConnectedServers = Registry.Get("ConnectedServers")
+
+    if not userConnectedServers.DoesExist("serverlist")
+        userConnectedServers.serverlist = []
+    end if
+
+    userConnectedServers.LookupCI("serverlist").push({ url: serverURL })
+
+    Registry.Set("ConnectedServers", userConnectedServers)
 end sub

@@ -36,6 +36,7 @@ sub itemContentChanged()
 
     m.itemText.text = itemData.title
     m.itemSubText.text = itemData.SecondaryTitle
+    m.itemText.repeatCount = itemData.focus ? - 1 : 0
     m.itemSubText.repeatCount = itemData.focus ? - 1 : 0
     m.liveLabel.visible = itemData.live
 

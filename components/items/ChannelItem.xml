@@ -6,8 +6,8 @@
             <Poster id="itemImage" width="200" height="133" loadWidth="200" loadHeight="133"
                 loadDisplayMode="limitSize" />
             <LayoutGroup layoutDirection="vert" vertAlignment="top" itemSpacings="5">
-                <Label id="itemText" horizAlign="left"
-                    font="font:MediumSystemFont" width="200" height="20" />
+                <ScrollingLabel id="itemText" horizAlign="left" repeatCount="0"
+                    font="font:MediumSystemFont" maxwidth="200" height="20" />
                 <ScrollingLabel id="itemSubText" horizAlign="left" repeatCount="0"
                     font="font:SmallSystemFont" maxwidth="200" height="20" />
             </LayoutGroup>

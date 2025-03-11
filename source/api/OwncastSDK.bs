@@ -1,6 +1,24 @@
 import "pkg:/source/Misc.bs"
 
 namespace api
+    namespace server
+        function instance(serverURL as string) as dynamic
+            return getJson(`${serverURL}/api/v1/instance`)
+        end function
+
+        function config(serverURL as string) as dynamic
+            return getJson(`${serverURL}/api/config`)
+        end function
+
+        function status(serverURL as string) as dynamic
+            return getJson(`${serverURL}/api/status`)
+        end function
+
+        function getThumbnailURL(serverURL as string) as string
+            return `${serverURL}/thumbnail.jpg?cachebuster=${Rnd(100000)}`
+        end function
+    end namespace
+
     namespace home
         function get() as dynamic
             return getJson(`https://directory.owncast.online/api/home`)
