@@ -1,5 +1,8 @@
 import "pkg:/source/Misc.bs"
+import "pkg:/source/api/OwncastSDK.bs"
+import "pkg:/source/enums/Constant.bs"
 import "pkg:/source/enums/KeyCode.bs"
+import "pkg:/source/enums/TaskControl.bs"
 import "pkg:/source/enums/VideoControl.bs"
 
 sub init()
@@ -8,9 +11,87 @@ end sub
 
 sub onVideoContentChanged()
     if not isValid(m.top.videoContent) then return
+
     m.video.content = m.top.videoContent
     m.video.control = VideoControl.Play
 end sub
 
+sub onDeeplinkContentChanged()
+    if not isValid(m.top.deeplinkContent) then return
+
+    m.getStreamDataTask = createObject("roSGNode", "GetStreamData")
+    m.getStreamsTask = createObject("roSGNode", "GetStreams")
+    m.getStreamsTask.observeField("responseBody", "onGetStreamsLoaded")
+    m.getStreamsTask.control = TaskControl.RUN
+end sub
+
 sub onShow()
 end sub
+
+sub onGetStreamsLoaded()
+    m.getStreamsTask.unobserveField("responseBody")
+    if not isValid(m.getStreamsTask.responseBody) then return
+
+    m.streams = m.getStreamsTask.responseBody
+    sortData()
+end sub
+
+sub sortData()
+    if not isChainValid(m.streams, "sections") then return
+    deeplinkID = m.top.deeplinkContent.LookupCI("contentID") ?? Constant.UNUSEDCONTENTID
+    m.top.deeplinkContent.clear()
+
+    streamList = []
+
+    m.getStreamDataTask.streamList = streamList
+    m.getStreamDataTask.control = TaskControl.RUN
+
+    for each streamSection in m.streams.sections
+        if not isChainValid(streamSection, "instances") then continue for
+
+        for each feed in streamSection.instances
+            thisItemTags = feed.LookupCI("tags")
+
+            itemTitle = feed.LookupCI("name")
+            itemID = feed.LookupCI("id").toStr()
+            itemSecondaryTitle = getStreamTitle(feed)
+            isLive = streamSection.LookupCI("online") ?? false
+            logoImageURI = `${feed.LookupCI("url")}${feed.LookupCI("logo")}`
+            thumbnailImageURI = api.image.getThumbnailURL(itemID)
+
+            if isStringEqual(itemID, deeplinkID)
+                thisItem = createObject("RoSGNode", "ChannelData")
+                thisItem.id = itemID
+                thisItem.live = isLive
+                thisItem.title = itemTitle
+                thisItem.SecondaryTitle = itemSecondaryTitle
+                thisItem.thumbnailImageURI = thumbnailImageURI
+                thisItem.logoImageURI = logoImageURI
+                thisItem.length = 0
+                thisItem.url = `${feed.LookupCI("url")}/hls/stream.m3u8`
+                m.top.videoContent = thisItem
+                deeplinkID = Constant.UNUSEDCONTENTID
+                exit for
+            end if
+        end for
+    end for
+end sub
+
+function getStreamTitle(feed as object) as string
+
+    feedStreamTitle = feed.LookupCI("streamTitle")
+    if isvalid(feedStreamTitle)
+        if len(feedStreamTitle) > 0
+            return feedStreamTitle
+        end if
+    end if
+
+    feedStreamDescription = feed.LookupCI("description")
+    if isvalid(feedStreamDescription)
+        if len(feedStreamDescription) > 0
+            return feedStreamDescription
+        end if
+    end if
+
+    return ""
+end function

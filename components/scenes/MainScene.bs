@@ -46,6 +46,15 @@ sub sortData()
     end if
 
     deeplinkID = m.top.args.LookupCI("contentID") ?? Constant.UNUSEDCONTENTID
+    m.top.args = {}
+
+    if isValid(m.top.directPlay)
+        if m.top.directPlay.count() > 0
+            deeplinkID = m.top.directPlay.LookupCI("contentID") ?? Constant.UNUSEDCONTENTID
+            m.top.args = {}
+            m.AppLaunchBeaconSent = true
+        end if
+    end if
 
     ' Channel sorting logic based on original code by @roadriverrail
     channelsByTag = {

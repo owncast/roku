@@ -16,9 +16,16 @@ namespace SceneCreator
         return scene
     end function
 
-    function PlayStream(streamData as object) as object
+    function PlayStream(streamData as object, deeplinkData as object) as object
         scene = CreateObject("roSGNode", "videoPlayer")
-        scene.videoContent = streamData
+        if isValid(streamData)
+            scene.videoContent = streamData
+        end if
+
+        if isValid(deeplinkData)
+            scene.deeplinkContent = deeplinkData
+        end if
+
         return scene
     end function
 end namespace

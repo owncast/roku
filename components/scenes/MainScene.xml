@@ -22,5 +22,6 @@
         <field id="deeplinkContent" type="node" />
         <field id="finalFocus" type="node" />
         <field id="args" type="assocarray" />
+        <field id="directPlay" type="assocarray" />
     </interface>
 </component>

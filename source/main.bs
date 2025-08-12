@@ -13,6 +13,9 @@ sub main (args as dynamic)
 
     m.global.sceneManager.callFunc("show", SceneCreator.MainScene(args))
 
+    input = CreateObject("roInput")
+    input.SetMessagePort(m.port)
+
     while(true)
         msg = wait(0, m.port)
         msgType = type(msg)
@@ -32,7 +35,7 @@ sub main (args as dynamic)
             if isStringEqual(msg.getField(), "deeplinkContent")
                 streamData = msg.getData()
                 if isValid(streamData)
-                    m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(streamData))
+                    m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(streamData, invalid))
                 end if
             end if
 
@@ -59,7 +62,7 @@ sub main (args as dynamic)
                     if isStringEqual(buttonData.id, "watchButton")
                         currentScene = m.global.sceneManager.callFunc("getCurrent")
                         if isChainValid(currentScene, "channelData")
-                            m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(currentScene.channelData))
+                            m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(currentScene.channelData, invalid))
                         end if
                     end if
 
@@ -81,6 +84,15 @@ sub main (args as dynamic)
                     if isStringEqual(buttonData.id, "disconnectButton")
                         disconnectServer()
                     end if
+                end if
+            end if
+        end if
+
+        if isStringEqual(msgType, "roInputEvent")
+            if msg.IsInput()
+                streamData = msg.GetInfo()
+                if isValid(streamData)
+                    m.global.sceneManager.callFunc("show", SceneCreator.PlayStream(invalid, streamData))
                 end if
             end if
         end if

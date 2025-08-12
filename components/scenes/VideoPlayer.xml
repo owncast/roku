@@ -11,5 +11,6 @@
     <interface>
         <function name="onShow" />
         <field id="videoContent" type="node" onchange="onVideoContentChanged" />
+        <field id="deeplinkContent" type="assocarray" onchange="onDeeplinkContentChanged" />
     </interface>
 </component>
