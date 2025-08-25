@@ -1,7 +1,7 @@
 # Channel Information
 title=Owncast
 major_version=2
-minor_version=0
+minor_version=1
 build_version=0
 
 # Channel Icon Images
@@ -20,3 +20,6 @@ splash_min_time=0
 
 # Comma separated list of resolutions the channel was designed to support
 ui_resolutions=hd
+
+# Required to say we support deep linking
+supports_input_launch=1
