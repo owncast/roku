@@ -9,7 +9,8 @@ function onKeyEvent(key as string, press as boolean) as boolean
     if not press then return false
 
     if isStringEqual(key, KeyCode.BACK)
-        m.global.sceneManager.callFunc("back")
-        return true
+        return m.global.sceneManager.callFunc("back")
     end if
+
+    return false
 end function
